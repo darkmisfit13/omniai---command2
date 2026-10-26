@@ -1,0 +1,8 @@
+{
+  "name": "OmniAI — DarkMisfitStudios",
+  "description": "OmniAI — the AI research and content creation studio for DarkMisfitStudios.",
+  "requestFeedback": false,
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

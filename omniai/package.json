@@ -1,0 +1,37 @@
+{
+  "name": "omniai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@heyputer/puter.js": "^2.6.4",
+    "@huggingface/inference": "^4.13.32",
+    "@supabase/supabase-js": "^2.45.0",
+    "fflate": "^0.8.3",
+    "next": "^15.5.27",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "stripe": "^23.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.3",
+    "autoprefixer": "^10.4.19",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.5.27",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4",
+    "typescript": "^5.5.2"
+  },
+  "overrides": {
+    "next": {
+      "postcss": "8.5.29"
+    },
+    "postcss-selector-parser": "7.1.6"
+  }
+}

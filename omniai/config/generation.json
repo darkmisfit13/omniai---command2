@@ -1,0 +1,188 @@
+{
+  "_comment": "OmniAI free-first generation routing. Cloud providers only for media. Local fallback stays enabled for lightweight text/diagnostics and is HARD-DISABLED for image/music/video. When a provider runs out of quota the router pauses and raises a notification; it never falls back to local media generation.",
+  "version": 1,
+  "project_name": "OmniAI",
+  "brand": "Darkmisfitstudios",
+  "system_guards": {
+    "max_system_ram_pct": 80,
+    "prevent_oom_crash": true
+  },
+  "pipelines": {
+    "image": {
+      "order": [
+        "pollinations_image",
+        "aihorde",
+        "puter",
+        "huggingface",
+        "cloudflare",
+        "google_gemini_image",
+        "pixazo",
+        "fal",
+        "apiframe",
+        "zsky"
+      ],
+      "allow_local_fallback": false,
+      "quota_behavior": "notify_switch_provider"
+    },
+    "music": {
+      "order": ["huggingface", "pixazo", "elevenlabs", "pollinations_gen", "apiframe"],
+      "allow_local_fallback": false,
+      "quota_behavior": "notify_switch_provider"
+    },
+    "video": {
+      "order": ["fal", "huggingface", "pollinations_gen", "pixazo", "apiframe", "zsky"],
+      "allow_local_fallback": false,
+      "quota_behavior": "notify_switch_provider"
+    },
+    "text_and_diagnostics": {
+      "order": ["gemini", "local_ollama"],
+      "allow_local_fallback": true,
+      "local_model_target": "qwen2.5:0.5b"
+    }
+  },
+  "providers": {
+    "pollinations_image": {
+      "label": "Pollinations image (keyless, unlimited-ish)",
+      "transport": "pollinations_image",
+      "keyEnv": null,
+      "keyRequired": false,
+      "free": true,
+      "docs": "https://pollinations.ai",
+      "models": { "image": "flux" }
+    },
+    "huggingface": {
+      "label": "Hugging Face Inference (free monthly credits)",
+      "transport": "huggingface",
+      "keyEnv": "HUGGINGFACE_API_KEY",
+      "keyEnvAlt": ["HF_TOKEN"],
+      "keyRequired": true,
+      "free": true,
+      "endpoint": "https://router.huggingface.co/hf-inference/models",
+      "docs": "https://huggingface.co/settings/tokens",
+      "models": {
+        "image": "black-forest-labs/FLUX.1-schnell",
+        "music": "facebook/musicgen-small",
+        "video": "Lightricks/LTX-Video"
+      }
+    },
+    "cloudflare": {
+      "label": "Cloudflare Workers AI (10k free neurons/day)",
+      "transport": "cloudflare",
+      "keyEnv": "CLOUDFLARE_API_TOKEN",
+      "accountEnv": "CLOUDFLARE_ACCOUNT_ID",
+      "keyRequired": true,
+      "free": true,
+      "docs": "https://developers.cloudflare.com/workers-ai/",
+      "models": { "image": "@cf/black-forest-labs/flux-1-schnell" }
+    },
+    "google_gemini_image": {
+      "label": "Google AI Studio Gemini image (free tier)",
+      "transport": "google_image",
+      "keyEnv": "GEMINI_API_KEY",
+      "keyEnvAlt": ["GOOGLE_API_KEY", "GOOGLE_GENERATIVE_AI_API_KEY"],
+      "keyRequired": true,
+      "free": true,
+      "docs": "https://aistudio.google.com/app/apikey",
+      "models": { "image": "gemini-2.5-flash-image" }
+    },
+    "pollinations_gen": {
+      "label": "Pollinations gen (needs Pollen credits - video/music here)",
+      "transport": "pollinations_gen",
+      "keyEnv": "POLLINATIONS_API_KEY",
+      "keyRequired": true,
+      "free": false,
+      "endpoint": "https://gen.pollinations.ai",
+      "docs": "https://enter.pollinations.ai/keys",
+      "models": { "image": "flux", "music": "elevenmusic", "video": "veo-3.1-fast" }
+    },
+    "aihorde": {
+      "label": "AI Horde (free, crowdsourced, works with no key)",
+      "transport": "aihorde",
+      "keyEnv": "AIHORDE_API_KEY",
+      "keyRequired": false,
+      "free": true,
+      "endpoint": "https://aihorde.net/api/v2",
+      "docs": "https://aihorde.net/api",
+      "models": { "image": "auto" }
+    },
+    "puter": {
+      "label": "Puter.js AI (free, billed to your Puter account)",
+      "transport": "puter",
+      "keyEnv": "PUTER_AUTH_TOKEN",
+      "keyRequired": true,
+      "free": true,
+      "docs": "https://developer.puter.com",
+      "models": { "image": "auto" }
+    },
+    "pixazo": {
+      "label": "Pixazo (free tier covers images and music)",
+      "transport": "pixazo",
+      "keyEnv": "PIXAZO_API_KEY",
+      "keyRequired": true,
+      "free": true,
+      "endpoint": "https://gateway.pixazo.ai",
+      "docs": "https://api-console.pixazo.ai/api_keys",
+      "models": { "image": "sdxl_lightning", "music": "tracks", "video": "ltx-2-5-lite" }
+    },
+    "fal": {
+      "label": "fal.ai (sign-up credits, image and video)",
+      "transport": "fal",
+      "keyEnv": "FAL_KEY",
+      "keyRequired": true,
+      "free": false,
+      "endpoint": "https://queue.fal.run",
+      "docs": "https://fal.ai/dashboard/keys",
+      "models": {
+        "image": "fal-ai/flux/schnell",
+        "video": "fal-ai/minimax/hailuo-02/standard/text-to-video"
+      }
+    },
+    "apiframe": {
+      "label": "APIFrame (one key for image, video and music - paid)",
+      "transport": "apiframe",
+      "keyEnv": "APIFRAME_API_KEY",
+      "keyRequired": true,
+      "free": false,
+      "endpoint": "https://api.apiframe.ai/v2",
+      "docs": "https://console.apiframe.ai",
+      "models": { "image": "flux-1.1-pro", "video": "seedance-1-lite", "music": "suno" }
+    },
+    "elevenlabs": {
+      "label": "ElevenLabs Music (paid)",
+      "transport": "elevenlabs",
+      "keyEnv": "ELEVENLABS_API_KEY",
+      "keyRequired": true,
+      "free": false,
+      "endpoint": "https://api.elevenlabs.io/v1",
+      "docs": "https://elevenlabs.io/app/settings/api-keys",
+      "models": { "music": "music_v2_5" }
+    },
+    "zsky": {
+      "label": "ZSky (prepaid balance or Pro/Max, image and video)",
+      "transport": "zsky",
+      "keyEnv": "ZSKY_API_KEY",
+      "keyRequired": true,
+      "free": false,
+      "endpoint": "https://zsky.ai/api",
+      "docs": "https://zsky.ai/api-docs",
+      "models": { "image": "default", "video": "fast" }
+    },
+    "gemini": {
+      "label": "Google Gemini text (free tier)",
+      "transport": "none",
+      "keyEnv": "GEMINI_API_KEY",
+      "keyEnvAlt": ["GOOGLE_API_KEY"],
+      "keyRequired": true,
+      "free": true,
+      "models": { "text": "gemini-2.0-flash" }
+    },
+    "local_ollama": {
+      "label": "Local Ollama (lightweight text/diagnostics only)",
+      "transport": "none",
+      "keyEnv": null,
+      "keyRequired": false,
+      "free": true,
+      "models": { "text": "qwen2.5:0.5b" }
+    }
+  }
+}

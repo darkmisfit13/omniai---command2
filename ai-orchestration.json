@@ -1,0 +1,37 @@
+{
+  "schema": "darkmisfitstudios.studio-matrix.v1",
+  "updated": "2026-10-16",
+  "program": "OmniAI Studio Ecosystem",
+  "vault": {
+    "name": "Global Media Link Vault",
+    "hook": "mediaVault (lib/mediaVault.ts)",
+    "rule": "Every studio that generates an asset (audio, video, image, 3D, pattern) MUST register it with mediaVault.push({ type, name, url, meta }) in real time. No asset is allowed to live only inside its generating studio's local state. Consumers (App/Web Builders, CapCut Video Timeline, Viral Mockup, Storyboard Supervisor, Voice/Dub Lab) must read from mediaVault via useMediaVault() and never request manual user downloads."
+  },
+  "studios": {
+    "Audio": ["Music Studio", "Voice & Deep-Dubbing Studio", "MV Studio"],
+    "Visual": ["Image Studio", "Vector Graphic & Branding Lab", "Cosmic UI Component Laboratory", "Face-Swap & Digital Costume Refiner", "Spatial 3D Studio"],
+    "Video": ["Video Editor (CapCut comprehensive)", "MV Studio (AI Music Video)"],
+    "Dev": ["App & Web Builder", "Backend & Database Architect", "Cosmic UI Component Laboratory", "API Connector & Webhook Hub"],
+    "Production": ["AI Storyboard & Script Supervisor", "Recraft Branding", "Viral Mockup & Social Feed Simulator", "Viral Mockup & Social Feed Simulator"],
+    "Analysis": ["Admin console", "Prompt Studio", "Website analysis", "Audit log", "Local Diagnostics", "Visual Backend & Database Architect"]
+  },
+  "crossPollination": {
+    "audio-to-video-timeline": "mediaVault assets of type 'audio'/'musicvideo' feed the CapCut Video Studio audio track via drag-drop (video-studio/page.tsx drop handler listens for mediaVault payloads).",
+    "image-to-video": "image type assets feed the CapCut video prompt box + the Viral Mockup device sandbox.",
+    "image-to-appbuilder": "image type assets feed the App & Web Builder and Cosmic UI Lab preview surfaces.",
+    "storyboard-to-studios": "Visual Storyboard Supervisor routes prompts to Krea Image Studio, Freebeat Video Studio, Voice Lab by mutating the vault after generation downstream.",
+    "mv-to-api-connector": "MV Studio pushes generated tracks to the API Connector payload ledger for distribution."
+  },
+  "themeTokens": {
+    "hud-bg": "#0b0a14", "hud-panel": "#14121f", "hud-border": "#211d34",
+    "violet": "#6c63ff", "violet-bright": "#8b7fff", "cyan": "#00f2fe", "green": "#6ee7b7", "pink": "#e879f9", "red": "#fb7185"
+  },
+  "navigation": {
+    "sidebarGroups": ["Workspace", "Media Creation Suite", "Coding & Web Development", "Production & Social Pipelines", "System"]
+  },
+  "health": {
+    "adminOwnerOnly": true,
+    "billingProvider": "Stripe",
+    "auth": "Supabase (email verification required for signup)"
+  }
+}

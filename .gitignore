@@ -1,0 +1,26 @@
+node_modules/
+.next/
+.next-diagnostic/
+.pilot-local-backups/
+.env.local
+.env*.local
+.codex-dev*.log
+server.log
+build.log
+push.log
+/supabase/.temp/
+*.tsbuildinfo
+*.bak
+
+# Long-Term Memory Engine — runtime profile (rebuilt from Supabase in prod)
+/.omni-memory/
+
+# Local edit backups (keep out of version control)
+*-before-*
+*.backup
+*.backup-*
+*-backup
+backup-conversations-*/
+/editor-foundation-backup-*/
+*.bak-*
+/dashboard-backups/

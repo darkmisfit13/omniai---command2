@@ -1,0 +1,79 @@
+# .studio-matrix-rules
+#
+# OmniAI Studio Matrix — Master Orchestration Rules
+# Generated: 2026-10-16. Treat this file as the canonical cross-studio contract.
+#
+# 0. PRINCIPLE
+#   All studios (Krea Image Studio, CapCut Video Editor, Suno Music Studio,
+#   Freebeat MV Studio, Voice/Dub Lab, Spatial 3D, App & Web Builder, Backend
+#   Architect, Cosmic UI Lab, API Connector, Storyboard Supervisor, Recraft
+#   Branding, Viral Mockup Simulator, Face-Swap Studio, Vault, Pricing, Admin)
+#   are deeply interconnected via the Global Media Link Vault defined in
+#   lib/mediaVault.ts (and exposed through lib/studioContext.tsx via useStudio()).
+#
+# 1. REGISTRATION (mandatory)
+#   Any studio that generates an asset (image / audio / video / music-video /
+#   beat / pattern / vector / 3D scene / .svg / report) MUST register it with:
+#       mediaVault.push({ type, name, url, meta })
+#   in real time, immediately after the asset is ready, inside the same promise
+#   chain that surfaced it to the user.
+#   Local-only copy of the asset in component state is forbidden. The vault is
+#   the single source of truth; Studio UI may derive a view via useMediaVault().
+#
+# 2. CONSUMPTION (manual downloads banned)
+#   Studios that reuse assets (App & Web Builder, Cosmic UI Lab, CapCut Video
+#   Timeline, Viral Mockup, Voice/Dub Lab, Storyboard Supervisor, Spatial 3D)
+#   must read assets from the vault through useMediaVault() and wire drag/drop
+#   handlers to accept `application/x-media-asset` payloads emitted by
+#   MediaLinkVault, never asking the user to manually download-then-upload.
+#
+# 3. STATE PROPAGATION
+#   Components receive shared state via StudioProvider (lib/studioContext.tsx):
+#     - user (id, email, displayName, role)
+#     - credits (number | null)
+#     - vaultAssets (live Media Link Vault array)
+#     - theme (dark/light)
+#   A profile edit, theme toggle, or credit consumption event must invoke
+#   refreshUser()/refreshCredits()/spendCredits(n) — NEVER mutate a local copy.
+#   Components not under StudioProvider fall back to useStudio()'s guest values.
+#
+# 4. VISUAL LANGUAGE (shared CSS design tokens)
+#   Every new studio / panel uses, in order:
+#     - `hud-panel` for cards with a 2px multi-color gradient rail
+#     - `d3-btn` / `d3-btn--primary` / `d3-tile` for tactile 3D controls
+#     - Palette: violet #6c63ff / bright #8b7fff, cyan #00f2fe, green #6ee7b7,
+#                magenta #e879f9, red #fb7185, amber #ffb84d, gold #fcd34d
+#     - Theme tokens `--hud-*` from globals.css; animated via cubic-bezier curves.
+#   Avoid introducing new color literals outside the dashboard palette without
+#   design approval.
+#
+# 5. ASSET METADATA (required)
+#   mediaVault.push calls must include at minimum:
+#     { type, name, url, meta: { prompt?, resolution?, bpm?, sampleRate?, seed?, duration?, source? } }
+#
+# 6. STATUS / FEEDBACK
+#   When a studio pushes to the vault, emit a short `toast` or vault-count update
+#   so the user immediately sees the asset appear in the dock. Otherwise the user
+#   will still feel like uploads/downloads are manual.
+#
+# 7. ACL
+#   Admin routes (see /admin) are gated by OMNIAI_OWNER_ID; no other account
+#   receives admin rights without explicit owner grant.
+#
+# 8. BACKEND
+#   Missing Supabase edge functions (generate-video, generate-music, etc.) are
+#   fine to frontend-stub in DEMO mode. When deployed, hook into the edge function
+#   by name (e.g. generate-music-lyrics, save-music-lyrics, generate-image-asset).
+#
+# 9. SIDEBAR GROUPING
+#   Any new studio item must be added under one of three sub-headers in
+#   app/Sidebar.tsx:
+#     - "Media Creation Suite"
+#     - "Coding & Web Development"
+#     - "Production & Social Pipelines"
+#   System routes (Dashboard, Chat, Pricing, Settings, Admin, Vault dock) grouped
+#   under "Workspace" / "System".
+#
+# 10. PROVIDERS
+#   Provider list used across dashboards/assistants must always include Groq
+#   (already wired in Supabase provider table) — never drop it.

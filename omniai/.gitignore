@@ -1,0 +1,20 @@
+node_modules/
+.next/
+.next-diagnostic/
+.pilot-local-backups/
+.env.local
+.env*.local
+.codex-dev*.log
+/supabase/.temp/
+*.tsbuildinfo
+*.bak
+
+# Local edit backups (keep out of version control)
+*-before-*
+*.backup
+*.backup-*
+*-backup
+backup-conversations-*/
+/editor-foundation-backup-*/
+*.bak-*
+/dashboard-backups/

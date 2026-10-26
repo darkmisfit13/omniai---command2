@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "next-env.d.ts",
+    ".next-diagnostic/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "supabase/**",
+    "omniai/supabase/**",
+    // Stale nested duplicate of this app — never imported by the live code,
+    // left untouched on disk, and kept out of type-checking so its frozen
+    // copies of the API routes don't fight the current lib/ types.
+    "omniai/**"
+  ]
+}
