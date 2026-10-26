@@ -32,7 +32,12 @@ import {
   Activity,
   FileVideo,
   FileAudio,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Music,
+  Keyboard,
+  X,
+  Smartphone,
+  Monitor
 } from "lucide-react";
 import ViewportCanvas, { type ShaderEffect } from "./ViewportCanvas";
 import TimelineEngine, { type TimelineClip } from "./TimelineEngine";
@@ -170,6 +175,72 @@ const INITIAL_CLIPS: TimelineClip[] = [
   },
 ];
 
+interface ExportPreset {
+  id: string;
+  name: string;
+  resolution: string;
+  aspectRatio: "16:9" | "9:16" | "1:1" | "21:9" | "Audio";
+  platform: string;
+  container: string;
+  codec: string;
+  description: string;
+  badge?: string;
+}
+
+const EXPORT_PRESETS: ExportPreset[] = [
+  {
+    id: "social_1080x1920",
+    name: "Social Media Vertical Reel",
+    resolution: "1080x1920",
+    aspectRatio: "9:16",
+    platform: "TikTok / IG Reels / YouTube Shorts",
+    container: ".mp4",
+    codec: "H.265 / HEVC GPU Hardware",
+    description: "Full-bleed 9:16 portrait video optimized for algorithmic social feeds & mobile screens.",
+    badge: "NEW PRESET",
+  },
+  {
+    id: "cinema_4k",
+    name: "Cinema 4K Master",
+    resolution: "3840x2160",
+    aspectRatio: "16:9",
+    platform: "Theater / Film Master / Desktop",
+    container: ".mov / .mp4",
+    codec: "ProRes 422 HQ / H.265",
+    description: "Full UHD high-bitrate archival master preserving maximum dynamic range.",
+  },
+  {
+    id: "broadcast_hd",
+    name: "Broadcast Standard 1080p",
+    resolution: "1920x1080",
+    aspectRatio: "16:9",
+    platform: "YouTube / Vimeo Standard",
+    container: ".mp4",
+    codec: "H.264 WebCodecs HW",
+    description: "Universal 16:9 landscape export for monitors and standard web players.",
+  },
+  {
+    id: "square_feed",
+    name: "Square Social Carousel",
+    resolution: "1080x1080",
+    aspectRatio: "1:1",
+    platform: "Instagram Feed / LinkedIn",
+    container: ".mp4",
+    codec: "H.264 High Profile",
+    description: "Balanced square viewport for high-impact social feed embeds.",
+  },
+  {
+    id: "lossless_wav",
+    name: "Lossless Master Audio Stems",
+    resolution: "48kHz / 24-bit",
+    aspectRatio: "Audio",
+    platform: "DAW / Spotify / Soundcloud",
+    container: ".wav",
+    codec: "PCM Linear Uncompressed",
+    description: "Studio-grade multi-track audio stem bounce with real-time waveform progress.",
+  },
+];
+
 export default function VideoStudioPage() {
   // Playback & Global Engine State
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -200,6 +271,8 @@ export default function VideoStudioPage() {
 
   // Tier 2: Deck Utility Action Keys State
   const [snapToGrid, setSnapToGrid] = useState<boolean>(true);
+  const [beatSync, setBeatSync] = useState<boolean>(true);
+  const [detectedBpm, setDetectedBpm] = useState<number>(128);
   const [magneticMode, setMagneticMode] = useState<boolean>(true);
   const [isGeneratingCaptions, setIsGeneratingCaptions] = useState<boolean>(false);
   const [isSmartCutting, setIsSmartCutting] = useState<boolean>(false);
@@ -208,6 +281,9 @@ export default function VideoStudioPage() {
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [exportProgress, setExportProgress] = useState<number>(0);
   const [notice, setNotice] = useState<string>("");
+  const [showExportModal, setShowExportModal] = useState<boolean>(false);
+  const [showShortcutsModal, setShowShortcutsModal] = useState<boolean>(false);
+  const [exportPreset, setExportPreset] = useState<string>("social_1080x1920");
 
   // Playback Timer
   useEffect(() => {
@@ -460,10 +536,19 @@ export default function VideoStudioPage() {
   };
 
   // WebCodecs GPU Export Simulation
-  const handleExportVideo = () => {
+  const handleExportVideo = (overridePresetId?: string) => {
+    const targetId = overridePresetId || exportPreset;
+    const activePreset = EXPORT_PRESETS.find((p) => p.id === targetId) || EXPORT_PRESETS[0];
+
+    // Automatically adjust aspect ratio if social media vertical is chosen
+    if (activePreset.aspectRatio !== "Audio") {
+      setAspectRatio(activePreset.aspectRatio);
+    }
+
     setIsExporting(true);
-    setExportProgress(10);
-    triggerNotice("WebCodecs Local-GPU zero-cloud-cost rendering started...");
+    setExportProgress(8);
+    setShowExportModal(true);
+    triggerNotice(`Exporting via WebCodecs Local-GPU: [${activePreset.name}] (${activePreset.resolution})...`);
 
     const interval = setInterval(() => {
       setExportProgress((p) => {
@@ -472,14 +557,87 @@ export default function VideoStudioPage() {
           setTimeout(() => {
             setIsExporting(false);
             setExportProgress(100);
-            triggerNotice("Local-GPU WebCodecs Export Complete! 4K H.265 Master ready.");
-          }, 500);
+            triggerNotice(`Export Complete! ${activePreset.name} (${activePreset.resolution}) ready for dispatch.`);
+          }, 600);
           return 100;
         }
-        return p + 25;
+        return p + 22;
       });
-    }, 400);
+    }, 350);
   };
+
+  // Dedicated Keyboard Shortcuts Listener for Timeline Navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        (e.target as HTMLElement)?.isContentEditable
+      ) {
+        return;
+      }
+
+      if (e.key === "?" || (e.shiftKey && e.key === "/")) {
+        e.preventDefault();
+        setShowShortcutsModal((prev) => !prev);
+        return;
+      }
+
+      if (e.key === "Escape") {
+        setShowShortcutsModal(false);
+        setShowExportModal(false);
+        setSelectedClipId(null);
+        return;
+      }
+
+      if (e.code === "Space") {
+        e.preventDefault();
+        setIsPlaying((p) => !p);
+      } else if (e.key === "Enter" || e.key === "Home") {
+        e.preventDefault();
+        setCurrentTime(0);
+        triggerNotice("Playhead returned to zero.");
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        const delta = e.shiftKey ? 5.0 : 0.5;
+        setCurrentTime((t) => Math.max(0, t - delta));
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        const delta = e.shiftKey ? 5.0 : 0.5;
+        setCurrentTime((t) => Math.min(duration, t + delta));
+      } else if (e.key === "j" || e.key === "J") {
+        e.preventDefault();
+        setCurrentTime((t) => Math.max(0, t - 2.0));
+      } else if (e.key === "k" || e.key === "K") {
+        e.preventDefault();
+        setIsPlaying(false);
+      } else if (e.key === "l" || e.key === "L") {
+        e.preventDefault();
+        setCurrentTime((t) => Math.min(duration, t + 2.0));
+      } else if (e.key === "s" || e.key === "S") {
+        e.preventDefault();
+        handleSplitAtPlayhead();
+      } else if (e.key === "Delete" || e.key === "Backspace") {
+        if (selectedClipId) {
+          e.preventDefault();
+          handleDeleteClip(selectedClipId);
+        }
+      } else if (e.key === "b" || e.key === "B") {
+        e.preventDefault();
+        setBeatSync((b) => !b);
+      } else if (e.key === "g" || e.key === "G") {
+        e.preventDefault();
+        setSnapToGrid((s) => !s);
+      } else if (e.key === "m" || e.key === "M") {
+        e.preventDefault();
+        setMagneticMode((m) => !m);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [duration, selectedClipId]);
 
   const filteredVaultItems = useMemo(() => {
     if (vaultFilter === "all") return vaultItems;
@@ -571,12 +729,21 @@ export default function VideoStudioPage() {
           </Link>
 
           <button
-            onClick={handleExportVideo}
-            disabled={isExporting}
-            className="flex items-center gap-1.5 rounded-lg border border-[#00ffa3] bg-[#00ffa3] px-3 py-1 text-[11px] font-black uppercase text-black hover:bg-[#39ffb4] transition shadow-[0_0_15px_rgba(0,255,163,0.3)] disabled:opacity-50"
+            onClick={() => setShowShortcutsModal(true)}
+            title="Timeline Navigation Shortcuts (?)"
+            className="flex items-center gap-1.5 rounded-lg border border-[#2e2055] bg-[#120d24] px-2.5 py-1 text-[11px] font-semibold text-slate-300 hover:text-[#00ffa3] hover:border-[#00ffa3]/40 transition"
+          >
+            <Keyboard className="h-3.5 w-3.5 text-[#00ffa3]" />
+            <span className="hidden md:inline">Shortcuts</span>
+            <kbd className="hidden lg:inline text-[9px] px-1 py-0.5 rounded bg-[#1f173b] text-slate-400 font-mono">?</kbd>
+          </button>
+
+          <button
+            onClick={() => setShowExportModal(true)}
+            className="flex items-center gap-1.5 rounded-lg border border-[#00ffa3] bg-[#00ffa3] px-3 py-1 text-[11px] font-black uppercase text-black hover:bg-[#39ffb4] transition shadow-[0_0_15px_rgba(0,255,163,0.3)]"
           >
             <Download className="h-3.5 w-3.5" />
-            <span>{isExporting ? `Exporting (${exportProgress}%)` : "Export 4K Video"}</span>
+            <span>{isExporting ? `Exporting (${exportProgress}%)` : "Export & Dispatch"}</span>
           </button>
         </div>
       </header>
@@ -823,6 +990,20 @@ export default function VideoStudioPage() {
 
           <div className="h-4 w-px bg-[#2e2055]" />
 
+          {/* Beat-Sync Toggle Button (Snaps to detected BPM grid) */}
+          <button
+            onClick={() => setBeatSync((b) => !b)}
+            className={`flex items-center gap-1.5 rounded-lg border px-2 py-1 font-mono text-[10px] font-bold transition ${
+              beatSync
+                ? "border-[#00ffa3] bg-[#00ffa3]/20 text-[#00ffa3] shadow-[0_0_12px_rgba(0,255,163,0.35)]"
+                : "border-[#2e2055] bg-[#16112c] text-slate-400 hover:text-white"
+            }`}
+            title={`Beat-Sync: Snap Clip Edits to ${detectedBpm} BPM Musical Grid (${(60 / detectedBpm).toFixed(3)}s intervals)`}
+          >
+            <Music className="h-3 w-3" />
+            <span>BEAT-SYNC: {beatSync ? `${detectedBpm} BPM` : "OFF"}</span>
+          </button>
+
           <button
             onClick={() => setSnapToGrid((s) => !s)}
             className={`flex items-center gap-1 rounded-lg border px-2 py-1 font-mono text-[10px] transition ${
@@ -833,7 +1014,7 @@ export default function VideoStudioPage() {
             title="Snap to 0.5s Grid"
           >
             <Grid className="h-3 w-3" />
-            <span>SNAP</span>
+            <span>SNAP (0.5s)</span>
           </button>
 
           <button
@@ -847,6 +1028,15 @@ export default function VideoStudioPage() {
           >
             <Magnet className="h-3 w-3" />
             <span>MAGNETIC</span>
+          </button>
+
+          <button
+            onClick={() => setShowShortcutsModal(true)}
+            className="flex items-center gap-1 rounded-lg border border-[#2e2055] bg-[#16112c] px-2 py-1 font-mono text-[10px] text-slate-400 hover:text-[#00ffa3] hover:border-[#00ffa3]/40 transition"
+            title="Open Timeline Navigation Shortcuts Guide (?)"
+          >
+            <Keyboard className="h-3 w-3" />
+            <span>KEYS (?)</span>
           </button>
         </div>
       </section>
@@ -868,8 +1058,270 @@ export default function VideoStudioPage() {
           onUpdateClipTime={handleUpdateClipTime}
           snapToGrid={snapToGrid}
           magneticMode={magneticMode}
+          beatSync={beatSync}
+          bpm={detectedBpm}
         />
       </section>
+
+      {/* ========================================================
+          EXPORT & DISPATCH TERMINAL MODAL (WITH SOCIAL MEDIA PRESET)
+      ======================================================== */}
+      {showExportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
+          <div className="relative w-full max-w-2xl rounded-2xl border border-[#2e2055] bg-[#0c0919] p-6 shadow-[0_0_50px_rgba(0,0,0,0.9)] space-y-5">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-[#2e2055] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="flex size-8 items-center justify-center rounded-lg border border-[#00ffa3]/40 bg-[#00ffa3]/10 text-[#00ffa3]">
+                  <Download className="size-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
+                    Export &amp; Dispatch Terminal
+                    <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-[#00ffa3]/15 text-[#00ffa3] border border-[#00ffa3]/30">
+                      WebCodecs GPU HW
+                    </span>
+                  </h3>
+                  <p className="text-[10px] text-slate-400">
+                    Select target aspect ratio &amp; encoding profile. Zero-cloud-cost local hardware rendering.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowExportModal(false)}
+                className="rounded-lg p-1 text-slate-400 hover:text-white hover:bg-[#1a1236] transition"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            {/* Presets List */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">
+                Available Aspect Ratio &amp; Platform Presets:
+              </label>
+              <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto pr-1">
+                {EXPORT_PRESETS.map((preset) => {
+                  const isSelected = exportPreset === preset.id;
+                  return (
+                    <div
+                      key={preset.id}
+                      onClick={() => setExportPreset(preset.id)}
+                      className={`p-3 rounded-xl border cursor-pointer transition flex items-center justify-between ${
+                        isSelected
+                          ? "border-[#00ffa3] bg-[#00ffa3]/10 shadow-[0_0_15px_rgba(0,255,163,0.15)]"
+                          : "border-[#2e2055] bg-[#120d24] hover:border-[#00ffa3]/40 hover:bg-[#16112c]"
+                      }`}
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-white">{preset.name}</span>
+                          <span className="font-mono text-[10px] font-bold text-[#00ffa3]">
+                            {preset.resolution}
+                          </span>
+                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#1f173b] text-slate-300">
+                            {preset.aspectRatio}
+                          </span>
+                          {preset.badge && (
+                            <span className="text-[8px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#00ffa3] text-black shadow-[0_0_8px_#00ffa3]">
+                              {preset.badge}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-slate-400">{preset.description}</p>
+                        <div className="flex items-center gap-3 text-[9px] font-mono text-slate-500 pt-0.5">
+                          <span>Codec: <strong className="text-slate-300">{preset.codec}</strong></span>
+                          <span>·</span>
+                          <span>Format: <strong className="text-slate-300">{preset.container}</strong></span>
+                          <span>·</span>
+                          <span>Target: <strong className="text-slate-300">{preset.platform}</strong></span>
+                        </div>
+                      </div>
+                      <div className="size-4 rounded-full border border-slate-600 flex items-center justify-center">
+                        {isSelected && <div className="size-2 rounded-full bg-[#00ffa3]" />}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Real-Time Visual Progress Bar */}
+            {isExporting && (
+              <div className="space-y-2 rounded-xl border border-[#00ffa3]/40 bg-[#00ffa3]/5 p-3">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-white flex items-center gap-2">
+                    <RefreshCw className="size-3.5 animate-spin text-[#00ffa3]" />
+                    Encoding Frames...
+                  </span>
+                  <span className="text-[#00ffa3] font-bold">{exportProgress}%</span>
+                </div>
+                <div className="w-full bg-[#1c1538] h-2 rounded-full overflow-hidden">
+                  <div
+                    className="bg-[#00ffa3] h-full transition-all duration-300 shadow-[0_0_10px_#00ffa3]"
+                    style={{ width: `${exportProgress}%` }}
+                  />
+                </div>
+                <p className="text-[9px] font-mono text-slate-400">
+                  GPU WebCodecs Hardware Acceleration active · Non-blocking frame queue.
+                </p>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-between pt-2 border-t border-[#2e2055]">
+              <div className="text-[10px] font-mono text-slate-400">
+                Preset Selected:{" "}
+                <span className="text-[#00ffa3] font-bold">
+                  {EXPORT_PRESETS.find((p) => p.id === exportPreset)?.name}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowExportModal(false)}
+                  className="px-4 py-2 rounded-xl border border-[#2e2055] text-xs font-semibold text-slate-400 hover:text-white hover:bg-[#120d24] transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleExportVideo(exportPreset)}
+                  disabled={isExporting}
+                  className="px-5 py-2 rounded-xl bg-[#00ffa3] text-black font-black text-xs uppercase tracking-wider hover:bg-[#39ffb4] transition shadow-[0_0_15px_rgba(0,255,163,0.3)] disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  <Download className="size-3.5" />
+                  <span>{isExporting ? `Rendering (${exportProgress}%)` : "Start GPU Export"}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          KEYBOARD SHORTCUT HELPER MODAL
+      ======================================================== */}
+      {showShortcutsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
+          <div className="relative w-full max-w-xl rounded-2xl border border-[#2e2055] bg-[#0c0919] p-6 shadow-[0_0_50px_rgba(0,0,0,0.9)] space-y-5">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-[#2e2055] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="flex size-8 items-center justify-center rounded-lg border border-[#00ffa3]/40 bg-[#00ffa3]/10 text-[#00ffa3]">
+                  <Keyboard className="size-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white tracking-wide">
+                    Timeline Navigation &amp; Editing Shortcuts
+                  </h3>
+                  <p className="text-[10px] text-slate-400">
+                    Master keyboard commands for zero-latency multi-track sequencer workflows.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowShortcutsModal(false)}
+                className="rounded-lg p-1 text-slate-400 hover:text-white hover:bg-[#1a1236] transition"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            {/* Shortcut Groups */}
+            <div className="space-y-4 max-h-72 overflow-y-auto pr-1">
+              {/* Group 1: Playback & Transport */}
+              <div className="space-y-2">
+                <h4 className="text-[10px] font-mono uppercase tracking-wider text-[#00ffa3] font-bold">
+                  Playback &amp; Transport
+                </h4>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-[#120d24] border border-[#2e2055]">
+                    <span className="text-slate-300">Play / Pause</span>
+                    <kbd className="px-2 py-0.5 rounded bg-[#1f173b] border border-[#2e2055] font-mono text-[10px] text-white">Space</kbd>
+                  </div>
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-[#120d24] border border-[#2e2055]">
+                    <span className="text-slate-300">Return to Zero</span>
+                    <kbd className="px-2 py-0.5 rounded bg-[#1f173b] border border-[#2e2055] font-mono text-[10px] text-white">Enter / Home</kbd>
+                  </div>
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-[#120d24] border border-[#2e2055]">
+                    <span className="text-slate-300">Step 0.5s (1 Frame)</span>
+                    <div className="flex gap-1 font-mono text-[10px]">
+                      <kbd className="px-1.5 py-0.5 rounded bg-[#1f173b] border border-[#2e2055] text-white">←</kbd>
+                      <kbd className="px-1.5 py-0.5 rounded bg-[#1f173b] border border-[#2e2055] text-white">→</kbd>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-[#120d24] border border-[#2e2055]">
+                    <span className="text-slate-300">Jump 5.0s</span>
+                    <kbd className="px-2 py-0.5 rounded bg-[#1f173b] border border-[#2e2055] font-mono text-[10px] text-white">Shift + ← / →</kbd>
+                  </div>
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-[#120d24] border border-[#2e2055]">
+                    <span className="text-slate-300">Shuttle Rewind / Pause / Fwd</span>
+                    <kbd className="px-2 py-0.5 rounded bg-[#1f173b] border border-[#2e2055] font-mono text-[10px] text-white">J / K / L</kbd>
+                  </div>
+                </div>
+              </div>
+
+              {/* Group 2: Timeline Editing & Snapping */}
+              <div className="space-y-2">
+                <h4 className="text-[10px] font-mono uppercase tracking-wider text-purple-400 font-bold">
+                  Timeline Editing &amp; Snapping
+                </h4>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-[#120d24] border border-[#2e2055]">
+                    <span className="text-slate-300">Split at Playhead</span>
+                    <kbd className="px-2 py-0.5 rounded bg-[#1f173b] border border-[#2e2055] font-mono text-[10px] text-white">S</kbd>
+                  </div>
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-[#120d24] border border-[#2e2055]">
+                    <span className="text-slate-300">Delete Selected Clip</span>
+                    <kbd className="px-2 py-0.5 rounded bg-[#1f173b] border border-[#2e2055] font-mono text-[10px] text-rose-300">Del / Backspace</kbd>
+                  </div>
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-[#120d24] border border-[#2e2055]">
+                    <span className="text-slate-300">Toggle Beat-Sync (BPM)</span>
+                    <kbd className="px-2 py-0.5 rounded bg-[#1f173b] border border-[#2e2055] font-mono text-[10px] text-white">B</kbd>
+                  </div>
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-[#120d24] border border-[#2e2055]">
+                    <span className="text-slate-300">Toggle 0.5s Grid Snap</span>
+                    <kbd className="px-2 py-0.5 rounded bg-[#1f173b] border border-[#2e2055] font-mono text-[10px] text-white">G</kbd>
+                  </div>
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-[#120d24] border border-[#2e2055]">
+                    <span className="text-slate-300">Toggle Magnetic Ripple</span>
+                    <kbd className="px-2 py-0.5 rounded bg-[#1f173b] border border-[#2e2055] font-mono text-[10px] text-white">M</kbd>
+                  </div>
+                </div>
+              </div>
+
+              {/* Group 3: Modal & Views */}
+              <div className="space-y-2">
+                <h4 className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold">
+                  Interface &amp; Modals
+                </h4>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-[#120d24] border border-[#2e2055]">
+                    <span className="text-slate-300">Toggle Shortcuts Guide</span>
+                    <kbd className="px-2 py-0.5 rounded bg-[#1f173b] border border-[#2e2055] font-mono text-[10px] text-white">?</kbd>
+                  </div>
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-[#120d24] border border-[#2e2055]">
+                    <span className="text-slate-300">Close Modal / Deselect</span>
+                    <kbd className="px-2 py-0.5 rounded bg-[#1f173b] border border-[#2e2055] font-mono text-[10px] text-white">Esc</kbd>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-between pt-2 border-t border-[#2e2055]">
+              <span className="text-[10px] font-mono text-slate-500">
+                Tip: Press <kbd className="text-[#00ffa3]">?</kbd> at any time to toggle this reference.
+              </span>
+              <button
+                onClick={() => setShowShortcutsModal(false)}
+                className="px-4 py-1.5 rounded-xl bg-[#00ffa3] text-black font-bold text-xs uppercase hover:bg-[#39ffb4] transition"
+              >
+                Got It
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Floating Notice Toast */}
       {notice && (

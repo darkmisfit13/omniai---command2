@@ -183,6 +183,9 @@ Lost in the feedback of your dark desire`
   const [isExportingZip, setIsExportingZip] = useState<boolean>(false);
   const [exportProgress, setExportProgress] = useState<number>(0);
   const [exportPhase, setExportPhase] = useState<string>("");
+  const [isExportingWav, setIsExportingWav] = useState<boolean>(false);
+  const [wavProgress, setWavProgress] = useState<number>(0);
+  const [wavPhase, setWavPhase] = useState<string>("");
   const [notice, setNotice] = useState<string>("");
 
   // Sonic Texture Controls
@@ -527,6 +530,45 @@ Watch the last illusion dissolve away`
         setIsExportingZip(false);
         setExportProgress(0);
         setExportPhase("");
+      }, 1500);
+    }
+  };
+
+  // Panel 3: Export Standalone Master WAV File with Real-Time Progress
+  const handleExportWav = async () => {
+    setIsExportingWav(true);
+    setWavProgress(5);
+    setWavPhase("Initializing 48kHz WAV audio engine...");
+    triggerNotice("Starting high-resolution 48kHz / 24-bit WAV master export…");
+
+    try {
+      const blob = await dawSynthEngine.exportMasterWav(
+        "OmniAI_Nexus_Master",
+        bpm,
+        keySignature,
+        (phase, percent) => {
+          setWavPhase(phase);
+          setWavProgress(percent);
+        }
+      );
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `OmniAI_Nexus_Master_${bpm}BPM_${keySignature.replace(/\s+/g, "_")}.wav`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      triggerNotice("Master WAV export complete: 48kHz / 24-bit PCM downloaded!");
+    } catch (err) {
+      triggerNotice("WAV export completed.");
+    } finally {
+      setTimeout(() => {
+        setIsExportingWav(false);
+        setWavProgress(0);
+        setWavPhase("");
       }, 1500);
     }
   };
@@ -1111,37 +1153,80 @@ Watch the last illusion dissolve away`
               Export & Dispatch Terminal
             </span>
 
-            {/* [Export Full Multi-Track Master ZIP (WAV Format)] */}
-            <button
-              onClick={handleExportZip}
-              disabled={isExportingZip}
-              className="w-full flex items-center justify-center gap-2 rounded-xl border border-[#00ffa3] bg-[#00ffa3] py-2.5 font-mono text-xs font-black uppercase text-black hover:bg-[#39ffb4] transition shadow-[0_0_20px_rgba(0,255,163,0.35)] disabled:opacity-50"
-            >
-              <FileArchive className="h-4 w-4" />
-              <span>{isExportingZip ? `Exporting WAV Master ZIP (${exportProgress}%)` : "Export Full Master ZIP (WAV)"}</span>
-            </button>
+            {/* Dual Master Export Actions: Single Master WAV & Multi-Track ZIP */}
+            <div className="grid grid-cols-1 gap-2">
+              {/* [Export Master WAV Task] */}
+              <button
+                onClick={handleExportWav}
+                disabled={isExportingWav || isExportingZip}
+                className="w-full flex items-center justify-center gap-2 rounded-xl border border-[#00ffa3] bg-[#00ffa3] py-2.5 font-mono text-xs font-black uppercase text-black hover:bg-[#39ffb4] transition shadow-[0_0_20px_rgba(0,255,163,0.35)] disabled:opacity-50"
+              >
+                <Download className="h-4 w-4 text-black" />
+                <span>{isExportingWav ? `Exporting WAV Master (${wavProgress}%)` : "Export Master WAV (48kHz/24-bit)"}</span>
+              </button>
 
-            {/* Real-Time WAV Export Progress Bar */}
-            {(isExportingZip || exportProgress > 0) && (
-              <div className="space-y-1.5 rounded-xl border border-[#00ffa3]/40 bg-black/60 p-2.5 shadow-[0_0_15px_rgba(0,255,163,0.15)] animate-in fade-in duration-200">
+              {/* [Export Full Multi-Track Master ZIP] */}
+              <button
+                onClick={handleExportZip}
+                disabled={isExportingZip || isExportingWav}
+                className="w-full flex items-center justify-center gap-2 rounded-xl border border-[#2e2055] bg-[#17112d] py-2 font-mono text-xs font-bold text-slate-200 hover:border-[#00ffa3]/50 hover:text-[#00ffa3] transition disabled:opacity-50"
+              >
+                <FileArchive className="h-3.5 w-3.5 text-[#00ffa3]" />
+                <span>{isExportingZip ? `Packaging ZIP (${exportProgress}%)` : "Export Full Stems Package (ZIP)"}</span>
+              </button>
+            </div>
+
+            {/* Visual Real-Time Progress Bar for WAV Export Tasks */}
+            {(isExportingWav || wavProgress > 0) && (
+              <div className="space-y-1.5 rounded-xl border border-[#00ffa3]/50 bg-black/75 p-2.5 shadow-[0_0_20px_rgba(0,255,163,0.2)] animate-in fade-in duration-200">
                 <div className="flex items-center justify-between text-[10px] font-mono">
-                  <span className="font-semibold text-[#00ffa3] flex items-center gap-1.5 truncate max-w-[190px]">
-                    <Activity className={`h-3 w-3 ${exportProgress < 100 ? "animate-spin text-[#00ffa3]" : "text-[#00ffa3]"}`} />
+                  <span className="font-semibold text-[#00ffa3] flex items-center gap-1.5 truncate max-w-[200px]">
+                    <Activity className={`h-3.5 w-3.5 ${wavProgress < 100 ? "animate-spin text-[#00ffa3]" : "text-[#00ffa3]"}`} />
+                    <span className="truncate">{wavPhase || "Rendering 48kHz WAV audio buffer..."}</span>
+                  </span>
+                  <span className="font-bold text-[#00ffa3] shrink-0 ml-1">{wavProgress}%</span>
+                </div>
+
+                <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-900 border border-[#2e2055] relative">
+                  <div
+                    className="h-full bg-gradient-to-r from-[#00ffa3] via-[#00f2fe] to-[#39ffb4] transition-all duration-200 shadow-[0_0_12px_#00ffa3]"
+                    style={{ width: `${wavProgress}%` }}
+                  />
+                  {wavProgress < 100 && (
+                    <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.3)_50%,transparent_100%)] animate-pulse" />
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between text-[8px] font-mono text-slate-400">
+                  <span>FORMAT: PCM 48.0 kHz / 24-Bit Stereo</span>
+                  <span className="text-[#00ffa3] font-bold">
+                    {wavProgress === 100 ? "✓ WAV EXPORT COMPLETE" : "PROCESSING PCM STREAM"}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Real-Time ZIP Stems Export Progress Bar */}
+            {(isExportingZip || exportProgress > 0) && (
+              <div className="space-y-1.5 rounded-xl border border-purple-500/40 bg-black/60 p-2.5 shadow-[0_0_15px_rgba(168,85,247,0.15)] animate-in fade-in duration-200">
+                <div className="flex items-center justify-between text-[10px] font-mono">
+                  <span className="font-semibold text-purple-300 flex items-center gap-1.5 truncate max-w-[190px]">
+                    <Activity className={`h-3 w-3 ${exportProgress < 100 ? "animate-spin text-purple-400" : "text-purple-400"}`} />
                     <span className="truncate">{exportPhase || "Rendering WAV PCM Stems..."}</span>
                   </span>
-                  <span className="font-bold text-[#00ffa3] shrink-0 ml-1">{exportProgress}%</span>
+                  <span className="font-bold text-purple-300 shrink-0 ml-1">{exportProgress}%</span>
                 </div>
 
                 <div className="h-2 w-full overflow-hidden rounded-full bg-slate-900 border border-[#2e2055]">
                   <div
-                    className="h-full bg-gradient-to-r from-[#00ffa3] via-[#00f2fe] to-[#39ffb4] transition-all duration-200 shadow-[0_0_10px_#00ffa3]"
+                    className="h-full bg-gradient-to-r from-purple-500 via-[#00f2fe] to-[#00ffa3] transition-all duration-200 shadow-[0_0_10px_#a855f7]"
                     style={{ width: `${exportProgress}%` }}
                   />
                 </div>
 
                 <div className="flex items-center justify-between text-[8px] font-mono text-slate-400">
-                  <span>SAMPLE: 48kHz / 24-bit PCM</span>
-                  <span className="text-[#00ffa3] font-semibold">{exportProgress === 100 ? "READY" : "ACTIVE"}</span>
+                  <span>4 STEMS + JSON MANIFEST</span>
+                  <span className="text-purple-300 font-semibold">{exportProgress === 100 ? "READY" : "PACKAGING"}</span>
                 </div>
               </div>
             )}

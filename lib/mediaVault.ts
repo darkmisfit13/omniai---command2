@@ -11,6 +11,7 @@ export interface VaultMeta {
   motion?: string;
   model?: string;
   source?: string;
+  [key: string]: unknown;
 }
 export interface VaultAsset {
   id: string;

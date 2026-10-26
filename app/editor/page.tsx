@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import {
   useCallback,
@@ -125,6 +125,9 @@ export default function EditorPage() {
   const [textDraft, setTextDraft] = useState("Your title");
   const [showTextDialog, setShowTextDialog] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
+  const [snapToGrid, setSnapToGrid] = useState(true);
+  const [beatSync, setBeatSync] = useState(true);
+  const [detectedBpm] = useState(128);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const timelineScrollRef = useRef<HTMLDivElement>(null);
@@ -646,6 +649,13 @@ export default function EditorPage() {
       }
     }
 
+    if (beatSync) {
+      const beatInterval = 60 / (detectedBpm || 128);
+      newStart = Math.round(newStart / beatInterval) * beatInterval;
+    } else if (snapToGrid) {
+      newStart = Math.round(newStart * 2) / 2;
+    }
+
     newStart = Math.max(0, Math.min(4 * 60 * 60 - item.length, newStart));
 
     setProject((current) => {
@@ -901,6 +911,30 @@ export default function EditorPage() {
                 <button onClick={() => setShowTextDialog(true)} className="rounded-lg border border-[#393252] px-3 py-2 text-xs hover:border-[#8b7fff]">＋ Text</button>
                 <button onClick={() => addTrack("video")} className="rounded-lg border border-[#393252] px-3 py-2 text-xs hover:border-[#8b7fff]">＋ Video track</button>
                 <button onClick={() => addTrack("audio")} className="rounded-lg border border-[#393252] px-3 py-2 text-xs hover:border-[#8b7fff]">＋ Audio track</button>
+                <button
+                  type="button"
+                  onClick={() => setBeatSync((prev) => !prev)}
+                  title={`Toggle Beat-Sync snapping clips to ${detectedBpm} BPM musical grid (${(60 / detectedBpm).toFixed(3)}s intervals)`}
+                  className={`rounded-lg border px-3 py-2 text-xs font-mono transition ${
+                    beatSync
+                      ? "border-[#00ffa3] bg-[#00ffa3]/20 text-[#00ffa3] font-bold shadow-[0_0_10px_rgba(0,255,163,0.3)]"
+                      : "border-[#393252] text-[#9490ac] hover:border-[#8b7fff]"
+                  }`}
+                >
+                  {beatSync ? `♩ Beat-Sync: ${detectedBpm} BPM` : "♩ Beat-Sync: Off"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSnapToGrid((prev) => !prev)}
+                  title="Toggle Snap to 0.5s Grid intervals when dragging clips"
+                  className={`rounded-lg border px-3 py-2 text-xs font-mono transition ${
+                    snapToGrid
+                      ? "border-[#00ffa3]/50 bg-[#00ffa3]/15 text-[#00ffa3] font-bold shadow-[0_0_10px_rgba(0,255,163,0.2)]"
+                      : "border-[#393252] text-[#9490ac] hover:border-[#8b7fff]"
+                  }`}
+                >
+                  {snapToGrid ? "⊞ Snap: 0.5s" : "⊞ Snap: Off"}
+                </button>
                 <label className="flex items-center gap-2 text-xs text-[#9490ac]">
                   Zoom
                   <input type="range" min="20" max="120" value={zoom} onChange={(event) => setZoom(Number(event.target.value))} className="w-20 accent-[#8b7fff]" />

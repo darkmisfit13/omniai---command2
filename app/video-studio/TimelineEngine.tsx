@@ -57,6 +57,8 @@ interface TimelineEngineProps {
   onUpdateClipTime: (clipId: string, newStart: number, newDuration: number) => void;
   snapToGrid: boolean;
   magneticMode: boolean;
+  beatSync?: boolean;
+  bpm?: number;
 }
 
 const TRACKS_METADATA: TrackConfig[] = [
@@ -111,10 +113,15 @@ export default function TimelineEngine({
   onUpdateClipTime,
   snapToGrid,
   magneticMode,
+  beatSync = true,
+  bpm = 128,
 }: TimelineEngineProps) {
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [trackConfigs, setTrackConfigs] = useState<TrackConfig[]>(TRACKS_METADATA);
   const timelineBodyRef = useRef<HTMLDivElement | null>(null);
+
+  // Musical Beat Grid Interval: 60 / BPM in seconds
+  const beatInterval = useMemo(() => 60 / (bpm > 0 ? bpm : 128), [bpm]);
 
   // Dragging / Trimming Clip state
   const [activeDrag, setActiveDrag] = useState<{
@@ -134,6 +141,18 @@ export default function TimelineEngine({
     }
     return markers;
   }, [duration, zoomLevel]);
+
+  // Detected BPM Beat Markers
+  const beatMarkers = useMemo(() => {
+    if (!beatSync) return [];
+    const markers: { time: number; isDownbeat: boolean }[] = [];
+    let beatIdx = 0;
+    for (let t = 0; t <= duration; t += beatInterval) {
+      markers.push({ time: t, isDownbeat: beatIdx % 4 === 0 });
+      beatIdx++;
+    }
+    return markers;
+  }, [duration, beatInterval, beatSync]);
 
   // Handle timeline ruler / body click to seek
   const handleTimelineClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -189,21 +208,39 @@ export default function TimelineEngine({
 
       if (activeDrag.mode === "move") {
         newStart = Math.max(0, Math.min(duration - newDuration, activeDrag.origStart + deltaSec));
-        if (snapToGrid) newStart = Math.round(newStart * 2) / 2; // snap to 0.5s
+        if (beatSync) {
+          // Snap precisely to detected BPM grid
+          newStart = Math.round(newStart / beatInterval) * beatInterval;
+        } else if (snapToGrid) {
+          newStart = Math.round(newStart * 2) / 2; // snap to 0.5s intervals
+        }
       } else if (activeDrag.mode === "trim_left") {
-        const potentialStart = Math.max(0, activeDrag.origStart + deltaSec);
+        let potentialStart = Math.max(0, activeDrag.origStart + deltaSec);
+        if (beatSync) {
+          potentialStart = Math.round(potentialStart / beatInterval) * beatInterval;
+        } else if (snapToGrid) {
+          potentialStart = Math.round(potentialStart * 2) / 2;
+        }
         const change = potentialStart - activeDrag.origStart;
-        if (activeDrag.origDuration - change > 0.5) {
+        if (activeDrag.origDuration - change >= 0.25) {
           newStart = potentialStart;
           newDuration = activeDrag.origDuration - change;
         }
       } else if (activeDrag.mode === "trim_right") {
-        newDuration = Math.max(0.5, Math.min(duration - activeDrag.origStart, activeDrag.origDuration + deltaSec));
+        let potentialDur = Math.max(0.25, Math.min(duration - activeDrag.origStart, activeDrag.origDuration + deltaSec));
+        if (beatSync) {
+          const snappedEnd = Math.round((activeDrag.origStart + potentialDur) / beatInterval) * beatInterval;
+          potentialDur = Math.max(beatInterval, snappedEnd - activeDrag.origStart);
+        } else if (snapToGrid) {
+          const snappedEnd = Math.round((activeDrag.origStart + potentialDur) * 2) / 2;
+          potentialDur = Math.max(0.5, snappedEnd - activeDrag.origStart);
+        }
+        newDuration = potentialDur;
       }
 
       onUpdateClipTime(activeDrag.clipId, newStart, newDuration);
     },
-    [activeDrag, duration, onUpdateClipTime, snapToGrid]
+    [activeDrag, duration, onUpdateClipTime, beatSync, snapToGrid, beatInterval]
   );
 
   const handleMouseUp = () => {
@@ -289,14 +326,15 @@ export default function TimelineEngine({
           onClick={handleTimelineClick}
           className="relative flex-1 cursor-pointer bg-[#000000] overflow-x-hidden overflow-y-auto"
         >
-          {/* Top SMPTE Time Ruler */}
+          {/* Top SMPTE Time Ruler & Musical Beat Counter */}
           <div className="relative h-7 border-b border-[#2e2055] bg-[#120d24]">
+            {/* Standard Time Markers */}
             {timeMarkers.map((marker) => {
               const markerPos = (marker / duration) * 100;
               return (
                 <div
                   key={marker}
-                  className="absolute top-0 bottom-0 flex flex-col justify-between border-l border-[#2e2055]/80 pl-1"
+                  className="absolute top-0 bottom-0 flex flex-col justify-between border-l border-[#2e2055]/80 pl-1 pointer-events-none"
                   style={{ left: `${markerPos}%` }}
                 >
                   <span className="font-mono text-[9px] text-slate-400">
@@ -306,6 +344,27 @@ export default function TimelineEngine({
                 </div>
               );
             })}
+
+            {/* Beat Grid Ruler Ticks when Beat-Sync is active */}
+            {beatSync &&
+              beatMarkers.map((bm, idx) => {
+                const pos = (bm.time / duration) * 100;
+                return (
+                  <div
+                    key={`beat-ruler-${idx}`}
+                    className="absolute bottom-0 pointer-events-none flex flex-col items-center"
+                    style={{ left: `${pos}%` }}
+                  >
+                    <div
+                      className={`w-px ${
+                        bm.isDownbeat
+                          ? "h-3 bg-[#00ffa3] shadow-[0_0_6px_#00ffa3]"
+                          : "h-1.5 bg-[#00D2FF]/40"
+                      }`}
+                    />
+                  </div>
+                );
+              })}
           </div>
 
           {/* 4 Visible Horizontal Multi-Row Tracks */}
@@ -327,6 +386,23 @@ export default function TimelineEngine({
                     />
                   ))}
                 </div>
+
+                {/* Beat-Sync Visual Grid Lines (Vertical ticks aligned to BPM) */}
+                {beatSync && (
+                  <div className="absolute inset-0 pointer-events-none">
+                    {beatMarkers.map((bm, idx) => (
+                      <div
+                        key={`beat-grid-${idx}`}
+                        className={`absolute top-0 bottom-0 border-l ${
+                          bm.isDownbeat
+                            ? "border-[#00ffa3]/25"
+                            : "border-[#00D2FF]/10"
+                        }`}
+                        style={{ left: `${(bm.time / duration) * 100}%` }}
+                      />
+                    ))}
+                  </div>
+                )}
 
                 {/* Clips Container */}
                 {trackClips.map((clip) => {

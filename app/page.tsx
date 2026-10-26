@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -10,6 +10,9 @@ import { useDirector } from "@/lib/directorMode";
 import { looksLikeMacro, executeMacro } from "@/lib/directorOrchestrator";
 import { emitHudActivity } from "./hud/hudActivity";
 import HoloOrb from "@/components/HoloOrb";
+import CenterConversationCore from "@/components/CenterConversationCore";
+import OmniChatOrbWebGL from "@/components/OmniChatOrbWebGL";
+import { orbEngineStore } from "@/lib/orbEngineStore";
 import ChatSidebar from "./chat/ChatSidebar";
 import { SKILLS_BY_ID, skillPromptFragment } from "@/lib/skills";
 import {
@@ -306,6 +309,15 @@ function ChatWorkspace({
     textarea.style.height = `${Math.min(contentHeight, maxHeight)}px`;
     textarea.style.overflowY = contentHeight > maxHeight ? "auto" : "hidden";
   }, [query]);
+
+  // Synchronize loading and Council mode state with WebGL Orb shader state
+  useEffect(() => {
+    if (loading || importance === "critical") {
+      orbEngineStore.setOrbState("thinking");
+    } else {
+      orbEngineStore.setOrbState("idle");
+    }
+  }, [loading, importance]);
 
   // Thread initialisation sequence: pull the long-term memory profile and the
   // caller's authorization role so every new thread starts already knowing the
@@ -1045,28 +1057,13 @@ ${sendQuery}`;
               </span>
             </div>
 
-            <div className="chat-gauge__window">
-              <div className="chat-gauge__mesh" aria-hidden="true">
-                <span className="mesh-line mesh-line--a" />
-                <span className="mesh-line mesh-line--b" />
-                <span className="mesh-line mesh-line--c" />
-                <span className="mesh-flare flare-a" />
-                <span className="mesh-flare flare-b" />
-                <span className="mesh-flare flare-c" />
-                <span className="mesh-flare flare-d" />
-                <svg className="mesh-orbit" viewBox="0 0 100 100" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="meshGrad" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stopColor="#00f2fe" stopOpacity="0.9" />
-                      <stop offset="50%" stopColor="#6c63ff" stopOpacity="0.7" />
-                      <stop offset="100%" stopColor="#6ee7b7" stopOpacity="0.9" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M 5 50 Q 25 12, 50 50 T 95 50" fill="none" stroke="url(#meshGrad)" strokeWidth="0.6" strokeDasharray="4 2" className="mesh-orbit-line" />
-                  <path d="M 0 70 Q 30 90, 50 40 T 100 30" fill="none" stroke="url(#meshGrad)" strokeWidth="0.4" strokeDasharray="2 3" className="mesh-orbit-line mesh-orbit-line--b" />
-                </svg>
-              </div>
-              <HoloOrb showLabel={false} />
+            <div className="chat-gauge__window flex items-center justify-center p-2 bg-[#000000]">
+              <OmniChatOrbWebGL
+                size="custom"
+                customWidth={180}
+                customHeight={180}
+                showBadge={false}
+              />
             </div>
 
             <div className="chat-presence__grid">
@@ -1145,32 +1142,22 @@ ${sendQuery}`;
           )}
 
           {historyLoaded && messages.length === 0 && (
-            <div className="omni-empty-state flex !min-h-full w-full translate-y-[13px] flex-col items-center justify-center px-4 py-5 text-center">
-              <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#6c63ff]/30 bg-[#6c63ff]/10 text-3xl text-[#a69eff] shadow-[0_0_32px_rgba(108,99,255,0.12)]">
-                &#x2726;
-              </div>
+            <div className="flex flex-col items-center justify-center w-full my-auto py-4">
+              {/* STEP 3: CENTER DASHBOARD CONVERSATION CORE (MAIN AREA OVERLAY) */}
+              <CenterConversationCore />
 
-              <h3 className="text-xl font-semibold text-[#e8e6f2]">
-                What are we working on?
-              </h3>
-
-              <p className="mt-3 max-w-md text-sm leading-6 text-[#9490ac]">
-                Ask a question, develop an idea, troubleshoot your projects,
-                or plan your next move. OmniAI will select the available
-                intelligence route based on your chosen mode and request.
-              </p>
-
-              <div className="mt-6 flex flex-wrap justify-center gap-2">
+              <div className="mt-4 flex flex-wrap justify-center gap-2 max-w-xl">
                 {[
                   "Help me plan a project",
-                  "Explain something technical",
-                  "Brainstorm creative ideas",
+                  "Design a dark aesthetic music video",
+                  "Erase apparel background in OmniStyle",
+                  "Auto-inject cinematic camera vectors",
                 ].map((suggestion) => (
                   <button
                     key={suggestion}
                     type="button"
                     onClick={() => setQuery(suggestion)}
-                    className="omni-suggestion-button rounded-xl border border-[#393252] bg-[#171426] px-3 py-2.5 text-xs font-medium text-white transition hover:border-[#8b7fff] hover:bg-[#6c63ff]/15 hover:text-white hover:shadow-[0_0_18px_rgba(108,99,255,0.15)]"
+                    className="omni-suggestion-button rounded-xl border border-[#393252] bg-[#171426] px-3.5 py-2 text-xs font-mono text-slate-200 transition hover:border-[#00ffa3] hover:bg-[#00ffa3]/10 hover:text-[#00ffa3] shadow-md"
                   >
                     {suggestion}
                   </button>

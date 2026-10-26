@@ -8,6 +8,11 @@ import FluidCanvas from "./hud/FluidCanvas";
 import MediaLinkVault from "./hud/MediaLinkVault";
 import { DirectorSwitchBar } from "./hud/DirectorSwitch";
 
+import HeaderBrandingOrb from "@/components/HeaderBrandingOrb";
+import StudioToggleMatrix from "@/components/StudioToggleMatrix";
+import StudioVoiceAssistantOverlay from "@/components/StudioVoiceAssistantOverlay";
+import { orbEngineStore } from "@/lib/orbEngineStore";
+
 export default function WorkspaceShell({
   children,
 }: {
@@ -16,11 +21,21 @@ export default function WorkspaceShell({
   const [navOpen, setNavOpen] = useState(false);
   const pathname = usePathname();
 
-  // Live credit balance for the wallet chip. The static "2,400 CR" that used
-  // to sit here was a placeholder that never moved — a misleading claim on a
-  // billing surface. This reads the same omni_credit_balance RPC /pricing and
-  // the Billing Hub use (RLS-scoped to the signed-in user); signed-out or
-  // pre-migration, the chip simply shows an em dash.
+  // Sync active studio context
+  useEffect(() => {
+    let contextName = "Universal Matrix";
+    if (pathname.includes("face-swap")) contextName = "OmniStyle Studio";
+    else if (pathname.includes("mv-studio")) contextName = "OmniBeat Studio";
+    else if (pathname.includes("storyboard")) contextName = "Omni Storyboard";
+    else if (pathname.includes("music")) contextName = "Music Studio";
+    else if (pathname.includes("video")) contextName = "Video Studio";
+    else if (pathname.includes("image")) contextName = "Image Studio";
+    else if (pathname.includes("voice")) contextName = "Voice Studio";
+    else if (pathname === "/") contextName = "OmniAI Chat";
+    orbEngineStore.setActiveStudioContext(contextName);
+  }, [pathname]);
+
+  // Live credit balance for the wallet chip.
   const [balance, setBalance] = useState<number | null>(null);
   useEffect(() => {
     let alive = true;
@@ -30,7 +45,7 @@ export default function WorkspaceShell({
         const { data } = await supabase.rpc("omni_credit_balance");
         if (alive && typeof data === "number") setBalance(data);
       } catch {
-        /* signed out or billing migration not run — keep the em dash */
+        /* signed out or billing migration not run */
       }
     })();
     return () => {
@@ -38,14 +53,8 @@ export default function WorkspaceShell({
     };
   }, []);
 
-  // The workspace nav is an overlay on every route, not just chat. Taking it
-  // out of the flow gives each page the full stage — the chat needs it for the
-  // hologram, and the studios need it for the timeline and preview.
   const isChat = pathname === "/";
 
-  // Chat is meant to arrive clear: no rail, nothing between the user and the
-  // orb. This only fires when the route actually changes, so opening the rail
-  // deliberately while you are in chat still works.
   useEffect(() => {
     if (isChat) setNavOpen(false);
   }, [isChat]);
@@ -54,9 +63,6 @@ export default function WorkspaceShell({
     setNavOpen(false);
   }
 
-  // On a phone the rail sits over the content, so it closes behind you. On a
-  // wide screen it is the app's navigation rather than an interruption, so it
-  // stays put while you move between routes.
   const handleNavigate = useCallback(() => {
     if (typeof window !== "undefined" && window.innerWidth < 1024) {
       setNavOpen(false);
@@ -75,6 +81,9 @@ export default function WorkspaceShell({
       />
 
       <div className="relative z-[2] flex min-h-0 min-w-0 w-full max-w-full flex-1 flex-col overflow-x-hidden">
+        {/* Universal Studio Voice Assistant Slide-Down Panel */}
+        <StudioVoiceAssistantOverlay />
+
         <header
           className="syn-workspace-header flex min-h-14 w-full min-w-0 max-w-full shrink-0 flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-[rgba(255,255,255,0.08)] bg-[rgba(11,10,20,0.62)] px-4 py-2 backdrop-blur-[24px] sm:h-14 sm:flex-nowrap sm:py-0 sm:px-6"
           style={{ WebkitBackdropFilter: "blur(24px)" }}
@@ -102,39 +111,38 @@ export default function WorkspaceShell({
               </svg>
             </button>
 
-            <div className="truncate text-xs tracking-[0.16em] text-[#9490ac]">
-              <span className="dms-display font-extrabold tracking-[0.02em] text-[#c5bfff]">
-                OmniAI
-              </span>
-              <span className="mx-2 text-[#393252]">/</span>
-              <span className="dms-mono text-[10px] tracking-[0.18em]">
-                DARKMISFITSTUDIOS
-              </span>
+            {/* STEP 2: HEADER BRANDING ORB (48px x 48px square asset in far upper-left corner) */}
+            <HeaderBrandingOrb />
+          </div>
+
+          <div className="flex items-center gap-2.5 ml-auto">
+            {/* STEP 4: UNIVERSAL STUDIO TOGGLE MATRIX (Space-saving toggle switch) */}
+            <StudioToggleMatrix />
+
+            {/* Director Mode — executive control module */}
+            <div className="hidden sm:block">
+              <DirectorSwitchBar />
             </div>
-          </div>
 
-          {/* Director Mode — executive control module */}
-          <div className="ml-auto md:ml-6 md:mr-1">
-            <DirectorSwitchBar />
-          </div>
+            {/* Global profile + credit wallet chip */}
+            <a
+              href="/settings"
+              className="hidden shrink-0 items-center gap-2 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(20,18,31,0.55)] px-3 py-1 text-[11px] text-[#c5bfff] backdrop-blur-[20px] transition hover:border-[#a69eff]/60 sm:text-xs md:flex"
+              title="Credit wallet & profile"
+            >
+              <span className="grid size-5 place-items-center rounded-full bg-gradient-to-br from-[#6c63ff] to-[#e879f9] text-[9px] font-bold text-white">OM</span>
+              <span className="dms-mono tracking-[0.12em]">
+                {balance === null ? "— CR" : `${balance.toLocaleString("en-US")} CR`}
+              </span>
+            </a>
 
-          {/* Global profile + credit wallet chip */}
-          <a
-            href="/settings"
-            className="ml-3 hidden shrink-0 items-center gap-2 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(20,18,31,0.55)] px-3 py-1 text-[11px] text-[#c5bfff] backdrop-blur-[20px] transition hover:border-[#a69eff]/60 sm:text-xs md:flex"
-            title="Credit wallet & profile"
-          >
-            <span className="grid size-5 place-items-center rounded-full bg-gradient-to-br from-[#6c63ff] to-[#e879f9] text-[9px] font-bold text-white">OM</span>
-            <span className="dms-mono tracking-[0.12em]">
-              {balance === null ? "— CR" : `${balance.toLocaleString("en-US")} CR`}
-            </span>
-          </a>
-          <div className="ml-3 flex shrink-0 items-center gap-2 text-[11px] text-[#9490ac] sm:text-xs">
-            <span className="dms-live-dot" aria-hidden="true" />
-            <span className="dms-mono hidden tracking-[0.16em] sm:inline">
-              STUDIO ONLINE
-            </span>
-            <span className="dms-mono tracking-[0.16em] sm:hidden">ONLINE</span>
+            <div className="flex shrink-0 items-center gap-2 text-[11px] text-[#9490ac] sm:text-xs">
+              <span className="dms-live-dot" aria-hidden="true" />
+              <span className="dms-mono hidden tracking-[0.16em] sm:inline">
+                STUDIO ONLINE
+              </span>
+              <span className="dms-mono tracking-[0.16em] sm:hidden">ONLINE</span>
+            </div>
           </div>
         </header>
 
