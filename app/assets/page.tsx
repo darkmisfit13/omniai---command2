@@ -34,9 +34,9 @@ const SIGNED_URL_TTL = 3600;
 
 type Tab = "all" | "image" | "video" | "audio";
 
-export type PresetFilterId = "none" | "vintage" | "noir" | "cyberpunk" | "cinematic" | "gothic";
+type PresetFilterId = "none" | "vintage" | "noir" | "cyberpunk" | "cinematic" | "gothic";
 
-export interface PresetFilter {
+interface PresetFilter {
   id: PresetFilterId;
   label: string;
   css: string;
@@ -44,7 +44,7 @@ export interface PresetFilter {
   badgeColor: string;
 }
 
-export const PRESET_FILTERS: PresetFilter[] = [
+const PRESET_FILTERS: PresetFilter[] = [
   {
     id: "none",
     label: "Normal",

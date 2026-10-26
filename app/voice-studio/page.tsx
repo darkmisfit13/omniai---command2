@@ -339,7 +339,7 @@ export default function VoiceStudioPage() {
       let freqArray = audioFreqDataRef.current;
       let liveIntensity = 0;
       if (analyserRef.current && freqArray && isPlayingAudio) {
-        analyserRef.current.getByteFrequencyData(freqArray);
+        analyserRef.current.getByteFrequencyData(freqArray as any);
         let sum = 0;
         for (let i = 0; i < 32; i++) sum += freqArray[i];
         liveIntensity = sum / (32 * 255);
