@@ -38,6 +38,7 @@ const navigation: {
 }[] = [
   { label: "Dashboard", href: "/dashboard", icon: "dashboard" },
   { label: "AI Director", href: "/", icon: "chat", hint: "OmniAI Chat" },
+  { label: "Call HUD", href: "/call", icon: "pulse", hint: "Live Tri-Council Call" },
   { label: "Omni Imagine", href: "/studio/image-studio", icon: "media", hint: "Image Studio" },
   { label: "OmniWave", href: "/studio/music", icon: "music", hint: "Music Studio" },
   { label: "OmniMotion", href: "/video-studio", icon: "film", hint: "Video Studio" },
@@ -80,7 +81,7 @@ const navGroups: {
     return hrefList.map(function (h) { return pick(h); }).filter(Boolean) as { label: string; href: string; icon: IconName; hint?: string }[];
   }
   return [
-    { key: "core", label: "Core Intelligence", accent: "#a78bfa", items: items(["/dashboard", "/"]) },
+    { key: "core", label: "Core Intelligence", accent: "#a78bfa", items: items(["/dashboard", "/", "/call"]) },
     { key: "creative", label: "Creative Studios", accent: "#e879f9", items: items(["/studio/image-studio", "/studio/music", "/video-studio", "/studio/mv-studio", "/studio/voice-studio", "/studio/storyboard"]) },
     { key: "specialized", label: "Specialized Tools", accent: "#00f2fe", items: items(["/studio/face-swap", "/studio/spatial-3d", "/studio/vector-graphics", "/studio/viral-mockup"]) },
     { key: "build", label: "Build & Integrations", accent: "#6ee7b7", items: items(["/studio/app-builder", "/studio/backend-architect", "/studio/ui-lab", "/studio/api-connector", "/integrations", "/automations"]) },

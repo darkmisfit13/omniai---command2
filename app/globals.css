@@ -62,7 +62,7 @@ body {
   background-image:
     radial-gradient(
       ellipse at 12% 0%,
-      rgba(99, 102, 241, 0.08),
+      rgba(12, 0, 202, 0.14),
       transparent 45%
     ) !important;
   font-size: 14px;
@@ -110,7 +110,7 @@ h4 {
 }
 
 ::selection {
-  background: #6366f1;
+  background: #0C00CA;
   color: #ffffff;
 }
 
@@ -268,9 +268,9 @@ a:focus-visible {
 /* Purplish-Blue glowing accent boundary halo on hover / active */
 .hud-btn:hover:not(:disabled),
 .hud-btn:active:not(:disabled) {
-  border-color: #6366f1;
-  background: rgba(99, 102, 241, 0.16);
-  box-shadow: 0 0 18px rgba(99, 102, 241, 0.35), inset 0 0 10px rgba(99, 102, 241, 0.10);
+  border-color: #0C00CA;
+  background: rgba(12, 0, 202, 0.2);
+  box-shadow: 0 0 20px rgba(12, 0, 202, 0.45), inset 0 0 10px rgba(12, 0, 202, 0.2);
 }
 
 .hud-btn:disabled {
@@ -279,16 +279,16 @@ a:focus-visible {
 }
 
 .hud-btn-primary {
-  border-color: #818cf8;
-  background: #6366f1;
+  border-color: #3d2cf5;
+  background: #0C00CA;
   color: #fff;
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.45);
+  box-shadow: 0 0 20px rgba(12, 0, 202, 0.5);
 }
 
 .hud-btn-primary:hover:not(:disabled) {
-  background: #4f46e5;
-  border-color: #a5b4fc;
-  box-shadow: 0 0 26px rgba(99, 102, 241, 0.65), inset 0 0 12px rgba(255, 255, 255, 0.2);
+  background: #3d2cf5;
+  border-color: #7c6eff;
+  box-shadow: 0 0 26px rgba(12, 0, 202, 0.75), inset 0 0 12px rgba(255, 255, 255, 0.2);
 }
 
 .hud-grid {
@@ -443,7 +443,7 @@ a:focus-visible {
 
 @keyframes omni-thinking-glow {
   0%, 100% { border-color: #1f1638; }
-  50% { border-color: #6366f1; box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+  50% { border-color: #0C00CA; box-shadow: 0 0 20px rgba(12, 0, 202, 0.45); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -462,9 +462,9 @@ a:focus-visible {
    ========================================= */
 
 :root {
-  --syn-violet-soft: rgba(99, 102, 241, 0.14);
-  --syn-violet-medium: rgba(99, 102, 241, 0.28);
-  --syn-violet-line: #6366f1;
+  --syn-violet-soft: rgba(12, 0, 202, 0.16);
+  --syn-violet-medium: rgba(12, 0, 202, 0.32);
+  --syn-violet-line: #0C00CA;
   --syn-surface-glass: rgba(10, 7, 27, 0.95);
 }
 
@@ -474,12 +474,12 @@ body {
   background-image:
     radial-gradient(
       ellipse at 10% 0%,
-      rgba(99, 102, 241, 0.08),
+      rgba(12, 0, 202, 0.12),
       transparent 38%
     ),
     radial-gradient(
       ellipse at 100% 85%,
-      rgba(79, 70, 229, 0.05),
+      rgba(12, 0, 202, 0.08),
       transparent 34%
     ) !important;
   background-attachment: fixed;
@@ -496,10 +496,10 @@ body {
 }
 
 .omni-ai-bubble:hover {
-  border-color: #6366f1 !important;
+  border-color: #0C00CA !important;
   box-shadow:
     0 12px 36px rgba(0, 0, 0, 0.4),
-    0 0 24px rgba(99, 102, 241, 0.25) !important;
+    0 0 24px rgba(12, 0, 202, 0.4) !important;
 }
 
 /* Cleaner Obsidian composer surface */
@@ -508,16 +508,16 @@ body {
   border: 1px solid #1f1638 !important;
   box-shadow:
     0 -10px 36px rgba(0, 0, 0, 0.4),
-    0 0 30px rgba(99, 102, 241, 0.06);
+    0 0 30px rgba(12, 0, 202, 0.15);
 }
 
 /* Purplish-Blue focus treatment */
 .omni-composer input:focus,
 .omni-composer textarea:focus {
-  border-color: #6366f1 !important;
+  border-color: #0C00CA !important;
   box-shadow:
-    0 0 0 3px rgba(99, 102, 241, 0.25),
-    0 0 25px rgba(99, 102, 241, 0.35) !important;
+    0 0 0 3px rgba(12, 0, 202, 0.3),
+    0 0 25px rgba(12, 0, 202, 0.45) !important;
 }
 
 /* Polished message and suggestion interactions */
@@ -530,11 +530,11 @@ button:active:not(:disabled) {
 }
 
 .omni-composer button[type="submit"]:not(:disabled) {
-  background: #6366f1;
+  background: #0C00CA;
   color: #fff;
-  border: 1px solid #818cf8;
+  border: 1px solid #3d2cf5;
   box-shadow:
-    0 0 18px rgba(99, 102, 241, 0.4),
+    0 0 18px rgba(12, 0, 202, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
@@ -607,9 +607,9 @@ button:active:not(:disabled) {
 }
 
 .syn-sidebar > button:hover:not(:disabled) {
-  border-color: #6366f1 !important;
+  border-color: #0C00CA !important;
   background: #181138 !important;
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 0 20px rgba(12, 0, 202, 0.45);
 }
 
 .syn-sidebar nav a {
@@ -624,14 +624,14 @@ button:active:not(:disabled) {
 
 .syn-sidebar nav a[aria-current="page"] {
   background: #140e33 !important;
-  border-color: #6366f1 !important;
-  box-shadow: 0 0 16px rgba(99, 102, 241, 0.3) !important;
+  border-color: #0C00CA !important;
+  box-shadow: 0 0 16px rgba(12, 0, 202, 0.45) !important;
 }
 
 .syn-sidebar nav a:hover:not([aria-current="page"]) {
   transform: translateX(2px);
-  border-color: #6366f1 !important;
-  box-shadow: 0 0 16px rgba(99, 102, 241, 0.25) !important;
+  border-color: #0C00CA !important;
+  box-shadow: 0 0 16px rgba(12, 0, 202, 0.35) !important;
 }
 
 .syn-workspace-header {
@@ -2330,15 +2330,15 @@ body {
 
 .chat-side__new {
   flex: 1;
-  background: #6366f1 !important;
-  border-color: #818cf8 !important;
+  background: #0C00CA !important;
+  border-color: #3d2cf5 !important;
   color: #fff !important;
-  box-shadow: 0 0 16px rgba(99, 102, 241, 0.35) !important;
+  box-shadow: 0 0 16px rgba(12, 0, 202, 0.45) !important;
 }
 
 .chat-side__new:hover:not(:disabled) {
-  background: #4f46e5 !important;
-  box-shadow: 0 0 22px rgba(99, 102, 241, 0.55) !important;
+  background: #3d2cf5 !important;
+  box-shadow: 0 0 22px rgba(12, 0, 202, 0.65) !important;
 }
 
 .chat-side__close {
@@ -2385,15 +2385,15 @@ body {
 .chat-side__tab.is-active {
   background: #140e33;
   color: #f1f0f7;
-  border: 1px solid #6366f1;
-  box-shadow: 0 0 16px rgba(99, 102, 241, 0.35);
+  border: 1px solid #0C00CA;
+  box-shadow: 0 0 16px rgba(12, 0, 202, 0.45);
 }
 
 .chat-side__count {
   margin-left: 0.35rem;
   padding: 0 0.32rem;
   border-radius: 999px;
-  background: #6366f1;
+  background: #0C00CA;
   color: #fff;
   font-size: 0.6rem;
   line-height: 1.35;

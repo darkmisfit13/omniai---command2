@@ -46,8 +46,8 @@ import { mediaVault } from "@/lib/mediaVault";
    Principal Creative Frontend Engineering
    Palette:
      - Canvas Background: #000000 (Pure Black)
-     - Layer Container Blocks: Dark Bluish Purple (#120d24, #16112c, #1a1336)
-     - Active Selection / Text Highlights: Very Light Neon Bluish Green (#00ffa3, #39ffb4)
+     - Layer Container Blocks: Dark Bluish Purple (#0a071b, #0a071b, #1a1336)
+     - Active Selection / Text Highlights: Very Light Neon Bluish Green (#00ffff, #00ffff)
    ========================================================================= */
 
 type StyleMode = "svg" | "raster" | "icon3d";
@@ -93,10 +93,10 @@ const BACKEND_MODELS = [
 ];
 
 const PRESET_COLOR_PALETTES = [
-  { name: "Obsidian Nexus", colors: ["#000000", "#140e28", "#00ffa3", "#00f2fe", "#e879f9"] },
-  { name: "Cyberpunk Noir", colors: ["#0b0a14", "#ff2a6d", "#00f2fe", "#00ffa3", "#8b7fff"] },
-  { name: "Dark Misfit Grief", colors: ["#08080c", "#1f182c", "#ff4365", "#c5bfff", "#39ffb4"] },
-  { name: "Emerald Phantom", colors: ["#050d0a", "#0b1f17", "#00ffa3", "#7affd4", "#ffffff"] }
+  { name: "Obsidian Nexus", colors: ["#000000", "#0a071b", "#00ffff", "#00f2fe", "#e879f9"] },
+  { name: "Cyberpunk Noir", colors: ["#0b0a14", "#ff2a6d", "#00f2fe", "#00ffff", "#8b7fff"] },
+  { name: "Dark Misfit Grief", colors: ["#08080c", "#1f182c", "#ff4365", "#c5bfff", "#00ffff"] },
+  { name: "Emerald Phantom", colors: ["#050d0a", "#0b1f17", "#00ffff", "#7affd4", "#ffffff"] }
 ];
 
 interface CanvasLayer {
@@ -137,8 +137,8 @@ export default function OmniImageStudioNexus() {
   // Color Locking Swatch (3 to 5 strict hexadecimal brand colors)
   const [lockedColors, setLockedColors] = useState<string[]>([
     "#000000",
-    "#140e28",
-    "#00ffa3",
+    "#0a071b",
+    "#00ffff",
     "#00f2fe",
     "#e879f9"
   ]);
@@ -224,7 +224,7 @@ export default function OmniImageStudioNexus() {
       mode: "svg",
       model: "Recraft-Vector v3",
       url: "",
-      svgData: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,10 90,85 10,85" fill="none" stroke="#00ffa3" stroke-width="4"/><circle cx="50" cy="55" r="18" fill="none" stroke="#00f2fe" stroke-width="2.5"/><path d="M30 65 L50 35 L70 65" stroke="#e879f9" stroke-width="2" fill="none"/></svg>`,
+      svgData: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,10 90,85 10,85" fill="none" stroke="#00ffff" stroke-width="4"/><circle cx="50" cy="55" r="18" fill="none" stroke="#00f2fe" stroke-width="2.5"/><path d="M30 65 L50 35 L70 65" stroke="#e879f9" stroke-width="2" fill="none"/></svg>`,
       timestamp: "10:28:45"
     }
   ]);
@@ -276,7 +276,7 @@ export default function OmniImageStudioNexus() {
         // Render Structural Wireframe Mesh Lines if toggled
         if (showWireframeMesh) {
           ctx2d.save();
-          ctx2d.strokeStyle = "rgba(0, 255, 163, 0.065)";
+          ctx2d.strokeStyle = "rgba(0, 255, 255, 0.065)";
           ctx2d.lineWidth = 1;
 
           const gridSize = 40 * zoomLevel;
@@ -295,7 +295,7 @@ export default function OmniImageStudioNexus() {
           ctx2d.stroke();
 
           // Isometric crosshair nexus points
-          ctx2d.fillStyle = "rgba(0, 255, 163, 0.25)";
+          ctx2d.fillStyle = "rgba(0, 255, 255, 0.25)";
           for (let x = offsetX; x < width; x += gridSize * 2) {
             for (let y = offsetY; y < height; y += gridSize * 2) {
               ctx2d.fillRect(x - 1.5, y - 1.5, 3, 3);
@@ -528,7 +528,7 @@ export default function OmniImageStudioNexus() {
     setTimeout(() => {
       const tracedSvg = `<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
         <rect width="800" height="600" fill="#000000" />
-        <path d="M150 450 Q 400 50, 650 450 T 400 550" fill="none" stroke="#00ffa3" stroke-width="4"/>
+        <path d="M150 450 Q 400 50, 650 450 T 400 550" fill="none" stroke="#00ffff" stroke-width="4"/>
         <circle cx="400" cy="300" r="100" fill="none" stroke="#00f2fe" stroke-width="3"/>
         <path d="M350 280 L450 280 L400 350 Z" fill="#e879f9" opacity="0.6"/>
       </svg>`;
@@ -566,7 +566,7 @@ export default function OmniImageStudioNexus() {
           l.id === selectedLayerId
             ? {
                 ...l,
-                filter: "drop-shadow(0 0 15px rgba(0,255,163,0.4))",
+                filter: "drop-shadow(0 0 15px rgba(0,255,255,0.4))",
                 name: `${l.name} (Alpha Transparent)`
               }
             : l
@@ -659,13 +659,13 @@ export default function OmniImageStudioNexus() {
   };
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden bg-[#000000] text-[#e8e6f2] font-sans selection:bg-[#00ffa3] selection:text-[#000000]">
+    <div className="flex h-screen w-full flex-col overflow-hidden bg-[#000000] text-[#e8e6f2] font-sans selection:bg-[#00ffff] selection:text-[#000000]">
       {/* ---------------------------------------------------------------------
           GLOBAL DESKTOP STUDIO HEADER (OMNIAI - NEXUS)
       --------------------------------------------------------------------- */}
-      <header className="z-30 flex shrink-0 items-center justify-between border-b border-[#35255e] bg-[#0d091a] px-4 py-2.5 sm:px-6">
+      <header className="z-30 flex shrink-0 items-center justify-between border-b border-[#1f1638] bg-[#0d091a] px-4 py-2.5 sm:px-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#00ffa3]/40 bg-[#16112c] text-[#00ffa3] shadow-[0_0_15px_rgba(0,255,163,0.3)]">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#00ffff]/40 bg-[#0a071b] text-[#00ffff] shadow-[0_0_15px_rgba(0,255,255,0.3)]">
             <Sparkles className="h-4 w-4 animate-pulse" />
           </div>
           <div>
@@ -673,7 +673,7 @@ export default function OmniImageStudioNexus() {
               <h1 className="font-mono text-sm font-extrabold uppercase tracking-widest text-[#e8e6f2]">
                 OmniAI - Nexus
               </h1>
-              <span className="rounded-full border border-[#00ffa3]/50 bg-[#00ffa3]/15 px-2 py-0.5 font-mono text-[9px] font-bold text-[#00ffa3]">
+              <span className="rounded-full border border-[#00ffff]/50 bg-[#00ffff]/15 px-2 py-0.5 font-mono text-[9px] font-bold text-[#00ffff]">
                 STUDIO V3 PRO
               </span>
             </div>
@@ -685,12 +685,12 @@ export default function OmniImageStudioNexus() {
 
         {/* Global Toolbar Status Indicators */}
         <div className="flex items-center gap-3">
-          <div className="hidden items-center gap-2 rounded-lg border border-[#35255e] bg-[#140e28] px-3 py-1 font-mono text-[10px] text-[#9490ac] md:flex">
-            <span className="h-2 w-2 rounded-full bg-[#00ffa3] shadow-[0_0_6px_#00ffa3]" />
+          <div className="hidden items-center gap-2 rounded-lg border border-[#1f1638] bg-[#0a071b] px-3 py-1 font-mono text-[10px] text-[#9490ac] md:flex">
+            <span className="h-2 w-2 rounded-full bg-[#00ffff] shadow-[0_0_6px_#00ffff]" />
             <span>MODEL: {BACKEND_MODELS.find((m) => m.id === selectedModel)?.label}</span>
           </div>
 
-          <div className="flex items-center gap-1.5 rounded-lg border border-[#35255e] bg-[#140e28] px-2.5 py-1 font-mono text-[10px] text-[#00ffa3]">
+          <div className="flex items-center gap-1.5 rounded-lg border border-[#1f1638] bg-[#0a071b] px-2.5 py-1 font-mono text-[10px] text-[#00ffff]">
             <Cpu className="h-3 w-3" />
             <span>GRID: ACTIVE</span>
           </div>
@@ -705,13 +705,13 @@ export default function OmniImageStudioNexus() {
         {/* ===================================================================
             PANEL 1: THE CONFIGURATION MATRIX (LEFT SIDEBAR - 25% WIDTH)
         =================================================================== */}
-        <aside className="flex w-full flex-col overflow-y-auto border-r border-[#35255e] bg-[#120d24] p-4 lg:w-[25%] lg:min-w-[320px] lg:max-w-[380px]">
+        <aside className="flex w-full flex-col overflow-y-auto border-r border-[#1f1638] bg-[#0a071b] p-4 lg:w-[25%] lg:min-w-[320px] lg:max-w-[380px]">
           <div className="space-y-4">
             
             {/* 1. STYLE ARCHITECTURE DECK */}
             <section className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#00ffa3]">
+                <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#00ffff]">
                   01 · Style Architecture Deck
                 </span>
                 <span className="font-mono text-[9px] text-[#9490ac]">MODE SELECTOR</span>
@@ -728,25 +728,25 @@ export default function OmniImageStudioNexus() {
                       onClick={() => setActiveStyleMode(arch.id)}
                       className={`flex items-start gap-3 rounded-xl border p-2.5 text-left transition-all ${
                         isSelected
-                          ? "border-[#00ffa3] bg-[#00ffa3]/15 shadow-[0_0_16px_rgba(0,255,163,0.2)]"
-                          : "border-[#35255e] bg-[#16112c] hover:border-[#00ffa3]/40 hover:bg-[#1a1435]"
+                          ? "border-[#00ffff] bg-[#00ffff]/15 shadow-[0_0_16px_rgba(0,255,255,0.2)]"
+                          : "border-[#1f1638] bg-[#0a071b] hover:border-[#00ffff]/40 hover:bg-[#0a071b]"
                       }`}
                     >
                       <div
                         className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border ${
                           isSelected
-                            ? "border-[#00ffa3] bg-[#00ffa3] text-[#000000]"
-                            : "border-[#35255e] bg-[#0c0817] text-[#9490ac]"
+                            ? "border-[#00ffff] bg-[#00ffff] text-[#000000]"
+                            : "border-[#1f1638] bg-[#0a071b] text-[#9490ac]"
                         }`}
                       >
                         <Icon className="h-4 w-4" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between">
-                          <p className={`font-mono text-xs font-bold ${isSelected ? "text-[#00ffa3]" : "text-[#e8e6f2]"}`}>
+                          <p className={`font-mono text-xs font-bold ${isSelected ? "text-[#00ffff]" : "text-[#e8e6f2]"}`}>
                             {arch.title}
                           </p>
-                          <span className="rounded bg-[#0c0817] px-1.5 py-0.5 font-mono text-[8px] font-bold text-[#9490ac]">
+                          <span className="rounded bg-[#0a071b] px-1.5 py-0.5 font-mono text-[8px] font-bold text-[#9490ac]">
                             {arch.badge}
                           </span>
                         </div>
@@ -761,10 +761,10 @@ export default function OmniImageStudioNexus() {
             </section>
 
             {/* 2. COLOR LOCKING SWATCH */}
-            <section className="rounded-xl border border-[#35255e] bg-[#16112c] p-3 space-y-2.5">
+            <section className="rounded-xl border border-[#1f1638] bg-[#0a071b] p-3 space-y-2.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
-                  <Palette className="h-3.5 w-3.5 text-[#00ffa3]" />
+                  <Palette className="h-3.5 w-3.5 text-[#00ffff]" />
                   <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#e8e6f2]">
                     Color Locking Swatch
                   </span>
@@ -774,7 +774,7 @@ export default function OmniImageStudioNexus() {
                   onClick={() => setPaletteLockActive(!paletteLockActive)}
                   className={`flex items-center gap-1 rounded px-2 py-0.5 font-mono text-[9px] font-bold transition ${
                     paletteLockActive
-                      ? "bg-[#00ffa3] text-[#000000]"
+                      ? "bg-[#00ffff] text-[#000000]"
                       : "bg-[#261a45] text-[#9490ac]"
                   }`}
                 >
@@ -790,7 +790,7 @@ export default function OmniImageStudioNexus() {
                     <button
                       type="button"
                       onClick={() => setActiveColorEditIdx(activeColorEditIdx === idx ? null : idx)}
-                      className="relative h-9 w-full rounded-lg border border-[#35255e] shadow-sm transition hover:scale-105 hover:border-[#00ffa3]"
+                      className="relative h-9 w-full rounded-lg border border-[#1f1638] shadow-sm transition hover:scale-105 hover:border-[#00ffff]"
                       style={{ backgroundColor: hex }}
                       title={`Color ${idx + 1}: ${hex}`}
                     >
@@ -799,7 +799,7 @@ export default function OmniImageStudioNexus() {
                       </span>
                     </button>
                     {activeColorEditIdx === idx && (
-                      <div className="absolute left-0 top-11 z-40 rounded-lg border border-[#35255e] bg-[#0c0817] p-2 shadow-xl">
+                      <div className="absolute left-0 top-11 z-40 rounded-lg border border-[#1f1638] bg-[#0a071b] p-2 shadow-xl">
                         <input
                           type="color"
                           value={hex}
@@ -818,7 +818,7 @@ export default function OmniImageStudioNexus() {
                             updated[idx] = e.target.value;
                             setLockedColors(updated);
                           }}
-                          className="mt-1 w-16 rounded border border-[#35255e] bg-[#140e28] px-1 py-0.5 font-mono text-[9px] text-[#00ffa3]"
+                          className="mt-1 w-16 rounded border border-[#1f1638] bg-[#0a071b] px-1 py-0.5 font-mono text-[9px] text-[#00ffff]"
                         />
                       </div>
                     )}
@@ -833,7 +833,7 @@ export default function OmniImageStudioNexus() {
                     key={p.name}
                     type="button"
                     onClick={() => setLockedColors(p.colors)}
-                    className="rounded border border-[#35255e] bg-[#0c0817] px-2 py-0.5 font-mono text-[9px] text-[#9490ac] transition hover:border-[#00ffa3] hover:text-[#00ffa3]"
+                    className="rounded border border-[#1f1638] bg-[#0a071b] px-2 py-0.5 font-mono text-[9px] text-[#9490ac] transition hover:border-[#00ffff] hover:text-[#00ffff]"
                   >
                     {p.name}
                   </button>
@@ -843,14 +843,14 @@ export default function OmniImageStudioNexus() {
 
             {/* 3. MULTI-MODEL SELECTION DROPDOWN */}
             <section className="space-y-1.5">
-              <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#00ffa3]">
+              <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#00ffff]">
                 02 · Backend Pipeline Node
               </span>
               <div className="relative">
                 <select
                   value={selectedModel}
                   onChange={(e) => setSelectedModel(e.target.value)}
-                  className="w-full appearance-none rounded-xl border border-[#35255e] bg-[#16112c] px-3 py-2 font-mono text-xs text-[#e8e6f2] outline-none transition focus:border-[#00ffa3]"
+                  className="w-full appearance-none rounded-xl border border-[#1f1638] bg-[#0a071b] px-3 py-2 font-mono text-xs text-[#e8e6f2] outline-none transition focus:border-[#00ffff]"
                 >
                   {BACKEND_MODELS.map((model) => (
                     <option key={model.id} value={model.id}>
@@ -858,14 +858,14 @@ export default function OmniImageStudioNexus() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-3 h-3.5 w-3.5 text-[#00ffa3]" />
+                <ChevronDown className="pointer-events-none absolute right-3 top-3 h-3.5 w-3.5 text-[#00ffff]" />
               </div>
             </section>
 
             {/* 4. INPUT HUD TEXT AREA */}
             <section className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#00ffa3]">
+                <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#00ffff]">
                   03 · Input HUD Text Area
                 </span>
                 <span className="font-mono text-[9px] text-[#9490ac]">ZERO-DOWNTIME</span>
@@ -880,8 +880,8 @@ export default function OmniImageStudioNexus() {
                     onClick={() => setAspectRatio(asp)}
                     className={`rounded-lg border py-1 font-bold transition ${
                       aspectRatio === asp
-                        ? "border-[#00ffa3] bg-[#00ffa3]/20 text-[#00ffa3]"
-                        : "border-[#35255e] bg-[#16112c] text-[#9490ac] hover:text-[#e8e6f2]"
+                        ? "border-[#00ffff] bg-[#00ffff]/20 text-[#00ffff]"
+                        : "border-[#1f1638] bg-[#0a071b] text-[#9490ac] hover:text-[#e8e6f2]"
                     }`}
                   >
                     {asp}
@@ -890,7 +890,7 @@ export default function OmniImageStudioNexus() {
               </div>
 
               {/* Multi-line Prompt Box */}
-              <div className="relative rounded-xl border border-[#35255e] bg-[#0c0817] p-2.5">
+              <div className="relative rounded-xl border border-[#1f1638] bg-[#0a071b] p-2.5">
                 <textarea
                   value={promptText}
                   onChange={(e) => setPromptText(e.target.value)}
@@ -909,7 +909,7 @@ export default function OmniImageStudioNexus() {
                 type="button"
                 onClick={handleEnhancePrompt}
                 disabled={isEnhancingPrompt || !promptText.trim()}
-                className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#00ffa3]/40 bg-[#00ffa3]/10 py-2 font-mono text-xs font-bold text-[#00ffa3] transition hover:bg-[#00ffa3]/20 disabled:opacity-40"
+                className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#00ffff]/40 bg-[#00ffff]/10 py-2 font-mono text-xs font-bold text-[#00ffff] transition hover:bg-[#00ffff]/20 disabled:opacity-40"
               >
                 <Wand2 className={`h-3.5 w-3.5 ${isEnhancingPrompt ? "animate-spin" : ""}`} />
                 <span>{isEnhancingPrompt ? "Expanding Matrix..." : "[Enhance Prompt Matrix]"}</span>
@@ -920,14 +920,14 @@ export default function OmniImageStudioNexus() {
                 type="button"
                 onClick={handleSynthesize}
                 disabled={isSynthesizing || !promptText.trim()}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#00ffa3] to-[#39ffb4] py-3 font-mono text-xs font-extrabold uppercase tracking-wider text-[#000000] shadow-[0_0_20px_rgba(0,255,163,0.3)] transition hover:shadow-[0_0_30px_rgba(0,255,163,0.5)] active:scale-[0.99] disabled:opacity-40"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0C00CA] border border-[#3d2cf5] py-3 font-mono text-xs font-extrabold uppercase tracking-wider text-white shadow-[0_0_20px_rgba(12,0,202,0.5)] transition hover:bg-[#3d2cf5] hover:shadow-[0_0_30px_rgba(12,0,202,0.7)] active:scale-[0.99] disabled:opacity-40"
               >
-                <Sparkles className="h-4 w-4" />
+                <Sparkles className="h-4 w-4 text-[#00ffff]" />
                 <span>{isSynthesizing ? "Synthesizing Layer..." : "Synthesize Plate // Nexus-Run"}</span>
               </button>
 
               {generationNotice && (
-                <p className="font-mono text-[10px] text-[#00ffa3]">{generationNotice}</p>
+                <p className="font-mono text-[10px] text-[#00ffff]">{generationNotice}</p>
               )}
             </section>
           </div>
@@ -953,7 +953,7 @@ export default function OmniImageStudioNexus() {
           {/* =================================================================
               FLOATING AI MICRO-EDIT TOOLBED (TOP OF CANVAS)
           ================================================================= */}
-          <div className="absolute top-4 left-1/2 z-20 flex -translate-x-1/2 flex-wrap items-center gap-2 rounded-2xl border border-[#35255e] bg-[#120d24]/90 p-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.8)] backdrop-blur-md">
+          <div className="absolute top-4 left-1/2 z-20 flex -translate-x-1/2 flex-wrap items-center gap-2 rounded-2xl border border-[#1f1638] bg-[#0a071b]/90 p-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.8)] backdrop-blur-md">
             {/* Tool 1: AI Magic Eraser Brush */}
             <button
               type="button"
@@ -963,8 +963,8 @@ export default function OmniImageStudioNexus() {
               }}
               className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 font-mono text-xs font-bold transition ${
                 activeTool === "eraser"
-                  ? "border border-[#00ffa3] bg-[#00ffa3] text-[#000000] shadow-[0_0_12px_#00ffa3]"
-                  : "border border-[#35255e] bg-[#16112c] text-[#e8e6f2] hover:border-[#00ffa3]/50"
+                  ? "border border-[#00ffff] bg-[#00ffff] text-[#000000] shadow-[0_0_12px_#00ffff]"
+                  : "border border-[#1f1638] bg-[#0a071b] text-[#e8e6f2] hover:border-[#00ffff]/50"
               }`}
               title="Vanish unwanted pixels cleanly"
             >
@@ -981,8 +981,8 @@ export default function OmniImageStudioNexus() {
               }}
               className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 font-mono text-xs font-bold transition ${
                 activeTool === "outpaint"
-                  ? "border border-[#00ffa3] bg-[#00ffa3] text-[#000000] shadow-[0_0_12px_#00ffa3]"
-                  : "border border-[#35255e] bg-[#16112c] text-[#e8e6f2] hover:border-[#00ffa3]/50"
+                  ? "border border-[#00ffff] bg-[#00ffff] text-[#000000] shadow-[0_0_12px_#00ffff]"
+                  : "border border-[#1f1638] bg-[#0a071b] text-[#e8e6f2] hover:border-[#00ffff]/50"
               }`}
               title="Extend image boundaries to wide monitor aspect ratios"
             >
@@ -999,8 +999,8 @@ export default function OmniImageStudioNexus() {
               }}
               className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 font-mono text-xs font-bold transition ${
                 activeTool === "vectorize"
-                  ? "border border-[#00ffa3] bg-[#00ffa3] text-[#000000] shadow-[0_0_12px_#00ffa3]"
-                  : "border border-[#35255e] bg-[#16112c] text-[#e8e6f2] hover:border-[#00ffa3]/50"
+                  ? "border border-[#00ffff] bg-[#00ffff] text-[#000000] shadow-[0_0_12px_#00ffff]"
+                  : "border border-[#1f1638] bg-[#0a071b] text-[#e8e6f2] hover:border-[#00ffff]/50"
               }`}
               title="Convert flat raster image to editable vector nodes"
             >
@@ -1017,8 +1017,8 @@ export default function OmniImageStudioNexus() {
               }}
               className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 font-mono text-xs font-bold transition ${
                 activeTool === "removebg"
-                  ? "border border-[#00ffa3] bg-[#00ffa3] text-[#000000] shadow-[0_0_12px_#00ffa3]"
-                  : "border border-[#35255e] bg-[#16112c] text-[#e8e6f2] hover:border-[#00ffa3]/50"
+                  ? "border border-[#00ffff] bg-[#00ffff] text-[#000000] shadow-[0_0_12px_#00ffff]"
+                  : "border border-[#1f1638] bg-[#0a071b] text-[#e8e6f2] hover:border-[#00ffff]/50"
               }`}
               title="Instantly strip backdrops down to alpha channel transparency"
             >
@@ -1032,8 +1032,8 @@ export default function OmniImageStudioNexus() {
               onClick={() => setShowWireframeMesh(!showWireframeMesh)}
               className={`flex items-center gap-1 rounded-xl border px-2.5 py-1.5 font-mono text-xs transition ${
                 showWireframeMesh
-                  ? "border-[#00ffa3]/40 bg-[#00ffa3]/10 text-[#00ffa3]"
-                  : "border-[#35255e] bg-[#16112c] text-[#9490ac]"
+                  ? "border-[#00ffff]/40 bg-[#00ffff]/10 text-[#00ffff]"
+                  : "border-[#1f1638] bg-[#0a071b] text-[#9490ac]"
               }`}
               title="Toggle Structural Wireframe Mesh Lines"
             >
@@ -1043,22 +1043,22 @@ export default function OmniImageStudioNexus() {
           </div>
 
           {/* Viewport Zoom & Transform HUD (Top Right of Canvas) */}
-          <div className="absolute right-4 top-4 z-20 flex items-center gap-1.5 rounded-xl border border-[#35255e] bg-[#120d24]/90 p-1 font-mono text-xs shadow-lg backdrop-blur-md">
+          <div className="absolute right-4 top-4 z-20 flex items-center gap-1.5 rounded-xl border border-[#1f1638] bg-[#0a071b]/90 p-1 font-mono text-xs shadow-lg backdrop-blur-md">
             <button
               type="button"
               onClick={() => setZoomLevel((z) => Math.max(0.2, z - 0.15))}
-              className="rounded p-1 text-[#9490ac] hover:text-[#00ffa3]"
+              className="rounded p-1 text-[#9490ac] hover:text-[#00ffff]"
               title="Zoom Out"
             >
               <ZoomOut className="h-3.5 w-3.5" />
             </button>
-            <span className="w-12 text-center text-[10px] font-bold text-[#00ffa3]">
+            <span className="w-12 text-center text-[10px] font-bold text-[#00ffff]">
               {Math.round(zoomLevel * 100)}%
             </span>
             <button
               type="button"
               onClick={() => setZoomLevel((z) => Math.min(4.0, z + 0.15))}
-              className="rounded p-1 text-[#9490ac] hover:text-[#00ffa3]"
+              className="rounded p-1 text-[#9490ac] hover:text-[#00ffff]"
               title="Zoom In"
             >
               <ZoomIn className="h-3.5 w-3.5" />
@@ -1066,7 +1066,7 @@ export default function OmniImageStudioNexus() {
             <button
               type="button"
               onClick={resetCanvasView}
-              className="rounded p-1 text-[#9490ac] hover:text-[#00ffa3]"
+              className="rounded p-1 text-[#9490ac] hover:text-[#00ffff]"
               title="Reset View 100%"
             >
               <RotateCcw className="h-3.5 w-3.5" />
@@ -1097,8 +1097,8 @@ export default function OmniImageStudioNexus() {
                   }}
                   className={`pointer-events-auto absolute rounded-xl border transition-all ${
                     isSelected
-                      ? "border-[#00ffa3] shadow-[0_0_35px_rgba(0,255,163,0.35)]"
-                      : "border-[#35255e]/60 shadow-[0_8px_30px_rgba(0,0,0,0.7)]"
+                      ? "border-[#00ffff] shadow-[0_0_35px_rgba(0,255,255,0.35)]"
+                      : "border-[#1f1638]/60 shadow-[0_8px_30px_rgba(0,0,0,0.7)]"
                   }`}
                   style={{
                     width: `${layer.width}px`,
@@ -1108,7 +1108,7 @@ export default function OmniImageStudioNexus() {
                   }}
                 >
                   {/* Layer Handle bar */}
-                  <div className="absolute -top-7 left-0 flex items-center gap-2 rounded-t-lg border border-b-0 border-[#35255e] bg-[#120d24] px-2.5 py-0.5 font-mono text-[9px] text-[#00ffa3]">
+                  <div className="absolute -top-7 left-0 flex items-center gap-2 rounded-t-lg border border-b-0 border-[#1f1638] bg-[#0a071b] px-2.5 py-0.5 font-mono text-[9px] text-[#00ffff]">
                     <span>{layer.name}</span>
                     <span className="text-[#9490ac]">{layer.width}x{layer.height}</span>
                   </div>
@@ -1129,7 +1129,7 @@ export default function OmniImageStudioNexus() {
 
                   {/* Eraser Brush Mask Canvas Overlay */}
                   {activeTool === "eraser" && isSelected && (
-                    <div className="absolute inset-0 rounded-xl bg-[#00ffa3]/10 border-2 border-dashed border-[#00ffa3] flex items-center justify-center font-mono text-xs text-[#00ffa3] backdrop-blur-[1px]">
+                    <div className="absolute inset-0 rounded-xl bg-[#00ffff]/10 border-2 border-dashed border-[#00ffff] flex items-center justify-center font-mono text-xs text-[#00ffff] backdrop-blur-[1px]">
                       [AI Eraser Brush Active · Drag to Vanish Region]
                     </div>
                   )}
@@ -1140,7 +1140,7 @@ export default function OmniImageStudioNexus() {
 
           {/* Active Tool Processing Indicator */}
           {isToolProcessing && (
-            <div className="absolute bottom-12 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-xl border border-[#00ffa3]/40 bg-[#120d24]/95 px-4 py-2 font-mono text-xs text-[#00ffa3] shadow-2xl backdrop-blur-md">
+            <div className="absolute bottom-12 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-xl border border-[#00ffff]/40 bg-[#0a071b]/95 px-4 py-2 font-mono text-xs text-[#00ffff] shadow-2xl backdrop-blur-md">
               <RefreshCw className="h-3.5 w-3.5 animate-spin" />
               <span>{toolTelemetryMsg}</span>
             </div>
@@ -1150,16 +1150,16 @@ export default function OmniImageStudioNexus() {
               TELEMETRY LINE (ABSOLUTE BOTTOM MARGIN)
           ================================================================= */}
           <footer className="z-20 flex items-center justify-between border-t border-[#1f1638] bg-[#000000] px-4 py-2 font-mono text-[10px] text-slate-400">
-            <div className="flex items-center gap-2 text-[#00ffcc]">
-              <span className="h-2 w-2 rounded-full bg-[#00ffcc] shadow-[0_0_8px_#00ffcc] animate-pulse" />
+            <div className="flex items-center gap-2 text-[#00ffff]">
+              <span className="h-2 w-2 rounded-full bg-[#00ffff] shadow-[0_0_8px_#00ffff] animate-pulse" />
               <span className="font-bold tracking-tight">
                 [Nexus-Inference: Max-Speed / Local-Ollama Override] · [Image-Engine Grid Active]
               </span>
             </div>
             <div className="flex items-center gap-4 text-slate-400">
               <span>CANVAS PAN: <strong className="text-white">X={Math.round(panX)} Y={Math.round(panY)}</strong></span>
-              <span>ZOOM: <strong className="text-[#00ffcc]">{Math.round(zoomLevel * 100)}%</strong></span>
-              <span>LAYERS: <strong className="text-[#00ffcc]">{layers.length} ACTIVE</strong></span>
+              <span>ZOOM: <strong className="text-[#00ffff]">{Math.round(zoomLevel * 100)}%</strong></span>
+              <span>LAYERS: <strong className="text-[#00ffff]">{layers.length} ACTIVE</strong></span>
             </div>
           </footer>
         </main>
@@ -1167,14 +1167,14 @@ export default function OmniImageStudioNexus() {
         {/* ===================================================================
             PANEL 3: ASSET VAULT & DISPATCH MANAGEMENT (RIGHT 25% WIDTH)
         =================================================================== */}
-        <aside className="flex w-full flex-col overflow-y-auto border-l border-[#35255e] bg-[#120d24] p-4 lg:w-[25%] lg:min-w-[320px] lg:max-w-[380px]">
+        <aside className="flex w-full flex-col overflow-y-auto border-l border-[#1f1638] bg-[#0a071b] p-4 lg:w-[25%] lg:min-w-[320px] lg:max-w-[380px]">
           <div className="space-y-4">
             
             {/* 1. GLOBAL PORTRAIT ANCHOR BAY */}
-            <section className="space-y-2 rounded-xl border border-[#35255e] bg-[#16112c] p-3">
+            <section className="space-y-2 rounded-xl border border-[#1f1638] bg-[#0a071b] p-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#00ffa3]">
+                  <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#00ffff]">
                     Global Portrait Anchor Bay
                   </span>
                   <p className="font-mono text-[9px] text-[#9490ac]">0 to 5 Master Face References</p>
@@ -1189,7 +1189,7 @@ export default function OmniImageStudioNexus() {
                 <button
                   type="button"
                   onClick={() => anchorFileInputRef.current?.click()}
-                  className="flex items-center gap-1 rounded border border-[#35255e] bg-[#0c0817] px-2 py-1 font-mono text-[9px] text-[#00ffa3] hover:border-[#00ffa3]"
+                  className="flex items-center gap-1 rounded border border-[#1f1638] bg-[#0a071b] px-2 py-1 font-mono text-[9px] text-[#00ffff] hover:border-[#00ffff]"
                 >
                   <Plus className="h-3 w-3" />
                   <span>Add Anchor</span>
@@ -1202,8 +1202,8 @@ export default function OmniImageStudioNexus() {
                 onClick={() => setLockAppearanceConsistency(!lockAppearanceConsistency)}
                 className={`flex w-full items-center justify-between rounded-lg border p-2 font-mono text-xs font-bold transition ${
                   lockAppearanceConsistency
-                    ? "border-[#00ffa3] bg-[#00ffa3]/15 text-[#00ffa3] shadow-[0_0_12px_rgba(0,255,163,0.2)]"
-                    : "border-[#35255e] bg-[#120d24] text-[#9490ac]"
+                    ? "border-[#00ffff] bg-[#00ffff]/15 text-[#00ffff] shadow-[0_0_12px_rgba(0,255,255,0.2)]"
+                    : "border-[#1f1638] bg-[#0a071b] text-[#9490ac]"
                 }`}
               >
                 <div className="flex items-center gap-1.5">
@@ -1216,7 +1216,7 @@ export default function OmniImageStudioNexus() {
               {/* Anchor Image Vertical Stack */}
               <div className="grid grid-cols-3 gap-1.5 pt-1">
                 {anchorImages.map((imgUrl, idx) => (
-                  <div key={idx} className="group relative aspect-square overflow-hidden rounded-lg border border-[#35255e] bg-[#000000]">
+                  <div key={idx} className="group relative aspect-square overflow-hidden rounded-lg border border-[#1f1638] bg-[#000000]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={imgUrl} alt={`Anchor ${idx}`} className="h-full w-full object-cover" />
                     <button
@@ -1227,7 +1227,7 @@ export default function OmniImageStudioNexus() {
                     >
                       <Trash2 className="h-3 w-3" />
                     </button>
-                    <span className="absolute bottom-0.5 left-1 font-mono text-[8px] font-bold text-[#00ffa3]">
+                    <span className="absolute bottom-0.5 left-1 font-mono text-[8px] font-bold text-[#00ffff]">
                       REF #{idx + 1}
                     </span>
                   </div>
@@ -1236,10 +1236,10 @@ export default function OmniImageStudioNexus() {
             </section>
 
             {/* 2. LAYER STACKING CONTROLS */}
-            <section className="space-y-2 rounded-xl border border-[#35255e] bg-[#16112c] p-3">
+            <section className="space-y-2 rounded-xl border border-[#1f1638] bg-[#0a071b] p-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
-                  <Layers className="h-3.5 w-3.5 text-[#00ffa3]" />
+                  <Layers className="h-3.5 w-3.5 text-[#00ffff]" />
                   <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#e8e6f2]">
                     Layer Stacking Order
                   </span>
@@ -1256,8 +1256,8 @@ export default function OmniImageStudioNexus() {
                       onClick={() => setSelectedLayerId(layer.id)}
                       className={`flex cursor-pointer items-center justify-between rounded-lg border p-2 transition ${
                         isSelected
-                          ? "border-[#00ffa3] bg-[#00ffa3]/15 text-[#00ffa3]"
-                          : "border-[#35255e] bg-[#120d24] text-[#9490ac] hover:text-[#e8e6f2]"
+                          ? "border-[#00ffff] bg-[#00ffff]/15 text-[#00ffff]"
+                          : "border-[#1f1638] bg-[#0a071b] text-[#9490ac] hover:text-[#e8e6f2]"
                       }`}
                     >
                       <span className="truncate font-mono text-[10px] font-bold">
@@ -1298,7 +1298,7 @@ export default function OmniImageStudioNexus() {
             {/* 3. PROJECT ASSET HISTORY TRACK */}
             <section className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#00ffa3]">
+                <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#00ffff]">
                   Project Asset History Track
                 </span>
                 <span className="font-mono text-[9px] text-[#9490ac]">SESSION COMPILES</span>
@@ -1308,7 +1308,7 @@ export default function OmniImageStudioNexus() {
                 {historyItems.map((item) => (
                   <div
                     key={item.id}
-                    className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-[#35255e] bg-[#16112c] p-2 transition hover:border-[#00ffa3]/50"
+                    className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-[#1f1638] bg-[#0a071b] p-2 transition hover:border-[#00ffff]/50"
                     onClick={() => {
                       // Stage history item on canvas
                       const newLayer: CanvasLayer = {
@@ -1340,7 +1340,7 @@ export default function OmniImageStudioNexus() {
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={item.url} alt={item.prompt} className="h-full w-full object-cover" />
                       )}
-                      <span className="absolute bottom-0 right-0 rounded-tl bg-black/80 px-1 font-mono text-[7px] text-[#00ffa3]">
+                      <span className="absolute bottom-0 right-0 rounded-tl bg-black/80 px-1 font-mono text-[7px] text-[#00ffff]">
                         {item.mode.toUpperCase()}
                       </span>
                     </div>
@@ -1360,8 +1360,8 @@ export default function OmniImageStudioNexus() {
             </section>
 
             {/* 4. EXPORT & DISPATCH TERMINAL */}
-            <section className="space-y-2 rounded-xl border border-[#35255e] bg-[#16112c] p-3">
-              <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#00ffa3]">
+            <section className="space-y-2 rounded-xl border border-[#1f1638] bg-[#0a071b] p-3">
+              <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#00ffff]">
                 Export &amp; Dispatch Terminal
               </span>
 
@@ -1369,7 +1369,7 @@ export default function OmniImageStudioNexus() {
               <button
                 type="button"
                 onClick={handleExportVectorPackage}
-                className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#00ffa3]/40 bg-[#00ffa3]/15 py-2.5 font-mono text-xs font-bold text-[#00ffa3] shadow-[0_0_15px_rgba(0,255,163,0.15)] transition hover:bg-[#00ffa3]/25 hover:shadow-[0_0_20px_rgba(0,255,163,0.3)]"
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#00ffff]/40 bg-[#00ffff]/15 py-2.5 font-mono text-xs font-bold text-[#00ffff] shadow-[0_0_15px_rgba(0,255,255,0.15)] transition hover:bg-[#00ffff]/25 hover:shadow-[0_0_20px_rgba(0,255,255,0.3)]"
               >
                 <Download className="h-4 w-4" />
                 <span>[Export Clean SVG / PNG Vector Package]</span>
@@ -1379,9 +1379,9 @@ export default function OmniImageStudioNexus() {
               <button
                 type="button"
                 onClick={handlePushToViralMockup}
-                className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#35255e] bg-[#1a1435] py-2.5 font-mono text-xs font-bold text-[#e8e6f2] transition hover:border-[#00ffa3] hover:text-[#00ffa3]"
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#1f1638] bg-[#0a071b] py-2.5 font-mono text-xs font-bold text-[#e8e6f2] transition hover:border-[#00ffff] hover:text-[#00ffff]"
               >
-                <Smartphone className="h-4 w-4 text-[#00ffa3]" />
+                <Smartphone className="h-4 w-4 text-[#00ffff]" />
                 <span>[Push Direct to Viral Mockup Pipeline]</span>
               </button>
             </section>

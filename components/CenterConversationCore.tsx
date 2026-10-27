@@ -6,8 +6,8 @@ import { Sparkles, Cpu, Radio, Volume2, Shield } from "lucide-react";
 
 /* =========================================================================
    DARK MISFIT STUDIOS — OMNIAI - NEXUS: CENTER DASHBOARD CONVERSATION CORE
-   Obsidian Cyberpunk: Pure Black #000000, Obsidian-Purple #0a071b,
-   Purplish-Blue #6366f1, Vibrant Neon Green #00ffcc.
+   Absolute Black Cyberpunk: Pure Black #000000, Obsidian-Purple #0a071b,
+   Purplish-Blue #0C00CA, Baby Blue #00ffff.
 ========================================================================= */
 
 export default function CenterConversationCore() {
@@ -25,21 +25,21 @@ export default function CenterConversationCore() {
         <div
           className={`absolute inset-0 pointer-events-none transition-opacity duration-500 opacity-20 ${
             state === "thinking"
-              ? "bg-[radial-gradient(circle_at_center,_#6366f1_0%,_transparent_65%)]"
-              : "bg-[radial-gradient(circle_at_center,_#00ffcc_0%,_transparent_65%)]"
+              ? "bg-[radial-gradient(circle_at_center,_#0C00CA_0%,_transparent_65%)]"
+              : "bg-[radial-gradient(circle_at_center,_#00ffff_0%,_transparent_65%)]"
           }`}
         />
 
-        {/* Top Header Row with High-Contrast Vibrant Neon Green Telemetry */}
+        {/* Top Header Row with High-Contrast Baby Blue Telemetry */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-[#1f1638] pb-3 mb-4 gap-2">
           <div className="flex items-center gap-2">
             <span
               className={`flex h-2.5 w-2.5 rounded-full transition-all duration-300 ${
                 state === "thinking"
-                  ? "bg-[#6366f1] shadow-[0_0_12px_#6366f1] animate-ping"
+                  ? "bg-[#0C00CA] shadow-[0_0_12px_#0C00CA] animate-ping"
                   : state === "talking"
-                  ? "bg-[#00ffcc] shadow-[0_0_12px_#00ffcc] animate-pulse"
-                  : "bg-[#00ffcc] shadow-[0_0_8px_#00ffcc]"
+                  ? "bg-[#00ffff] shadow-[0_0_12px_#00ffff] animate-pulse"
+                  : "bg-[#00ffff] shadow-[0_0_8px_#00ffff]"
               }`}
             />
             <span className="font-mono text-xs font-bold uppercase tracking-wider text-white">
@@ -49,21 +49,21 @@ export default function CenterConversationCore() {
 
           <div className="flex items-center gap-2">
             <span className="font-mono text-[10px] text-slate-300 bg-[#000000] border border-[#1f1638] px-2 py-0.5 rounded-md">
-              Context: <span className="text-[#00ffcc] font-bold">{activeStudioContext}</span>
+              Context: <span className="text-[#00ffff] font-bold">{activeStudioContext}</span>
             </span>
             <span className="font-mono text-[10px] text-slate-300 bg-[#000000] border border-[#1f1638] px-2 py-0.5 rounded-md hidden xs:inline">
-              LPU: <span className="text-[#00ffcc] font-bold">{latencyMs.toFixed(1)}ms</span>
+              LPU: <span className="text-[#00ffff] font-bold">{latencyMs.toFixed(1)}ms</span>
             </span>
           </div>
         </div>
 
         {/* Global Standard Telemetry Line */}
-        <div className="mb-3 px-3 py-1.5 rounded-lg border border-[#00ffcc]/30 bg-[#000000] flex items-center justify-between">
-          <span className="font-mono text-[10px] font-bold text-[#00ffcc] tracking-wide">
+        <div className="mb-3 px-3 py-1.5 rounded-lg border border-[#00ffff]/40 bg-[#000000] flex items-center justify-between shadow-[0_0_10px_rgba(0,255,255,0.15)]">
+          <span className="font-mono text-[10px] font-bold text-[#00ffff] tracking-wide">
             [Nexus-Inference: Max-Speed / Local-Ollama Override]
           </span>
-          <span className="font-mono text-[9px] text-[#00ffcc] flex items-center gap-1 font-semibold">
-            <span className="size-1.5 rounded-full bg-[#00ffcc] shadow-[0_0_6px_#00ffcc]" />
+          <span className="font-mono text-[9px] text-[#00ffff] flex items-center gap-1 font-semibold">
+            <span className="size-1.5 rounded-full bg-[#00ffff] shadow-[0_0_6px_#00ffff]" />
             ACTIVE
           </span>
         </div>
@@ -93,15 +93,15 @@ export default function CenterConversationCore() {
                   height: state === "talking" ? `${Math.max(4, freq * 24)}px` : "4px",
                   backgroundColor:
                     state === "talking"
-                      ? "#00ffcc"
+                      ? "#00ffff"
                       : state === "thinking"
-                      ? "#6366f1"
+                      ? "#0C00CA"
                       : "#1f1638",
                   boxShadow:
                     state === "talking"
-                      ? "0 0 10px rgba(0,255,204,0.7)"
+                      ? "0 0 10px rgba(0,255,255,0.7)"
                       : state === "thinking"
-                      ? "0 0 10px rgba(99,102,241,0.7)"
+                      ? "0 0 10px rgba(12,0,202,0.7)"
                       : "none",
                 }}
               />
@@ -120,8 +120,8 @@ export default function CenterConversationCore() {
               onClick={() => handleStateChange("idle")}
               className={`px-2.5 py-1 rounded-lg font-mono text-[10px] font-bold uppercase transition border ${
                 state === "idle"
-                  ? "border-[#00ffcc] bg-[#00ffcc]/15 text-[#00ffcc] shadow-[0_0_12px_rgba(0,255,204,0.35)]"
-                  : "border-[#1f1638] bg-[#000000] text-slate-400 hover:text-white hover:border-[#6366f1]"
+                  ? "border-[#00ffff] bg-[#00ffff]/15 text-[#00ffff] shadow-[0_0_12px_rgba(0,255,255,0.35)]"
+                  : "border-[#1f1638] bg-[#000000] text-slate-400 hover:text-white hover:border-[#0C00CA]"
               }`}
             >
               [Idle Wave]
@@ -131,8 +131,8 @@ export default function CenterConversationCore() {
               onClick={() => handleStateChange("thinking")}
               className={`px-2.5 py-1 rounded-lg font-mono text-[10px] font-bold uppercase transition border ${
                 state === "thinking"
-                  ? "border-[#6366f1] bg-[#6366f1] text-white shadow-[0_0_16px_rgba(99,102,241,0.6)] animate-pulse"
-                  : "border-[#1f1638] bg-[#000000] text-slate-400 hover:text-white hover:border-[#6366f1]"
+                  ? "border-[#0C00CA] bg-[#0C00CA] text-white shadow-[0_0_18px_rgba(12,0,202,0.65)] animate-pulse"
+                  : "border-[#1f1638] bg-[#000000] text-slate-400 hover:text-white hover:border-[#0C00CA]"
               }`}
             >
               [Thinking / Council]
@@ -142,8 +142,8 @@ export default function CenterConversationCore() {
               onClick={() => handleStateChange("talking")}
               className={`px-2.5 py-1 rounded-lg font-mono text-[10px] font-bold uppercase transition border ${
                 state === "talking"
-                  ? "border-[#00ffcc] bg-[#00ffcc]/20 text-[#00ffcc] shadow-[0_0_14px_rgba(0,255,204,0.4)]"
-                  : "border-[#1f1638] bg-[#000000] text-slate-400 hover:text-white hover:border-[#6366f1]"
+                  ? "border-[#00ffff] bg-[#00ffff]/20 text-[#00ffff] shadow-[0_0_14px_rgba(0,255,255,0.4)]"
+                  : "border-[#1f1638] bg-[#000000] text-slate-400 hover:text-white hover:border-[#0C00CA]"
               }`}
             >
               [Talking Back]

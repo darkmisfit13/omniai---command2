@@ -36,12 +36,11 @@ import StudioToggleMatrix from "@/components/StudioToggleMatrix";
 
 /* =========================================================================
    DARK MISFIT STUDIOS — OMNIAI - NEXUS: OMNISTYLE STUDIO
-   Principal Creative Media Architecture & Frontend Engineering
-   Palette Parameters:
-     - Canvas Background: #000000 (Pure Black)
-     - Layer Container blocks: Dark Bluish Purple (#0e0a1c, #120d24, #16112c, #1a1336, #211742)
-     - Active Outfitting Selections: Very Light Neon Bluish Green (#00ffa3, #39ffb4)
-   Naming: "OmniAI - Nexus"
+   Absolute Black Cyberpunk Specifications:
+     - Pure Shiny Black Canvas: #000000
+     - Deep Obsidian-Purple Panels & Cards: #0a071b
+     - Purplish-Blue Primary Accents & Halos: #0C00CA (Bright: #3d2cf5)
+     - Baby Blue Diagnostic Metrics & Telemetry: #00ffff
    ========================================================================= */
 
 type GarmentCategory = "all" | "tops" | "bottoms" | "outerwear" | "footwear" | "accessories";
@@ -162,10 +161,10 @@ type LightingEnvironment = "cyberpunk" | "studio" | "cinematic";
 
 const BRAND_PALETTE = [
   { name: "Pure Obsidian", hex: "#000000" },
-  { name: "Dark Misfit Purple", hex: "#140e28" },
-  { name: "Neon Bluish-Green", hex: "#00ffa3" },
-  { name: "Electric Cyan", hex: "#00f2fe" },
-  { name: "Ultraviolet", hex: "#e879f9" },
+  { name: "Obsidian-Purple", hex: "#0a071b" },
+  { name: "Purplish-Blue", hex: "#0C00CA" },
+  { name: "Baby Blue", hex: "#00ffff" },
+  { name: "Electric Indigo", hex: "#1d08e0" },
 ];
 
 export default function OmniStyleStudioNexus() {
@@ -1036,32 +1035,32 @@ export default function OmniStyleStudioNexus() {
           </div>
 
           {/* 2. Real-Time Contextual Recommendations (Tri-Agent Council) */}
-          <div className="rounded-xl border border-[#2e2055] bg-[#120d24] p-3 space-y-2.5">
+          <div className="rounded-xl border border-[#1f1638] bg-[#0a071b] p-3 space-y-2.5">
             <div className="flex items-center justify-between">
               <span className="font-mono text-[10px] uppercase tracking-wider text-slate-300 font-bold flex items-center gap-1.5">
-                <Sparkles className="h-3 w-3 text-[#00ffa3]" />
+                <Sparkles className="h-3 w-3 text-[#00ffff]" />
                 Tri-Agent Contextual Council
               </span>
               <button
                 onClick={handleConsultTriAgentCouncil}
                 disabled={isConsultingCouncil}
-                className="font-mono text-[9px] text-[#00ffa3] hover:underline"
+                className="font-mono text-[9px] text-[#00ffff] hover:underline"
               >
                 {isConsultingCouncil ? "Evaluating…" : "Refresh"}
               </button>
             </div>
 
             {/* Schedule Item Input */}
-            <div className="rounded-lg border border-[#1f1638] bg-[#0a071b] p-2 text-[10px] font-mono text-slate-300">
+            <div className="rounded-lg border border-[#1f1638] bg-[#000000] p-2 text-[10px] font-mono text-slate-300">
               <span className="text-slate-500 block text-[8px] uppercase font-mono">Upcoming Schedule Node:</span>
-              <span className="text-[#00ffcc] font-bold">{recommendationSchedule}</span>
+              <span className="text-[#00ffff] font-bold">{recommendationSchedule}</span>
             </div>
 
-            {/* Tri-Agent Council 3 Voice Blocks (All Strings in Vibrant Neon Green #00ffcc) */}
+            {/* Tri-Agent Council 3 Voice Blocks (All Strings in Baby Blue #00ffff) */}
             <div className="space-y-2 font-mono text-[9px] leading-relaxed">
               {/* Strategist */}
               <div className="rounded-lg border border-[#1f1638] bg-[#0a071b] p-2.5 space-y-1">
-                <span className="font-extrabold text-[#00ffcc] uppercase block tracking-wider drop-shadow-[0_0_8px_rgba(0,255,204,0.4)]">
+                <span className="font-extrabold text-[#00ffff] uppercase block tracking-wider drop-shadow-[0_0_8px_rgba(0,255,255,0.4)]">
                   [1. THE STRATEGIST] // STRUCTURAL &amp; FABRIC PERFORMANCE
                 </span>
                 <p className="text-slate-200">{triAgentLog.strategist}</p>
@@ -1069,7 +1068,7 @@ export default function OmniStyleStudioNexus() {
 
               {/* Empath */}
               <div className="rounded-lg border border-[#1f1638] bg-[#0a071b] p-2.5 space-y-1">
-                <span className="font-extrabold text-[#00ffcc] uppercase block tracking-wider drop-shadow-[0_0_8px_rgba(0,255,204,0.4)]">
+                <span className="font-extrabold text-[#00ffff] uppercase block tracking-wider drop-shadow-[0_0_8px_rgba(0,255,255,0.4)]">
                   [2. THE EMPATH] // HEARTBREAK &amp; EMOTIONAL RESONANCE
                 </span>
                 <p className="text-slate-200">{triAgentLog.empath}</p>
@@ -1077,7 +1076,7 @@ export default function OmniStyleStudioNexus() {
 
               {/* Ghost */}
               <div className="rounded-lg border border-[#1f1638] bg-[#0a071b] p-2.5 space-y-1">
-                <span className="font-extrabold text-[#00ffcc] uppercase block tracking-wider drop-shadow-[0_0_8px_rgba(0,255,204,0.4)]">
+                <span className="font-extrabold text-[#00ffff] uppercase block tracking-wider drop-shadow-[0_0_8px_rgba(0,255,255,0.4)]">
                   [3. THE GHOST] // CYBERPUNK AVANT-GARDE EDGE
                 </span>
                 <p className="text-slate-200">{triAgentLog.ghost}</p>
@@ -1089,10 +1088,10 @@ export default function OmniStyleStudioNexus() {
           <div className="rounded-xl border border-[#1f1638] bg-[#0a071b] p-3 space-y-2">
             <div className="flex items-center justify-between">
               <span className="font-mono text-[10px] uppercase tracking-wider text-white font-bold flex items-center gap-1.5">
-                <CloudRain className="h-3 w-3 text-[#00ffcc]" />
+                <CloudRain className="h-3 w-3 text-[#00ffff]" />
                 Live Environment Weather Sync
               </span>
-              <span className="font-mono text-[8px] text-[#00ffcc] bg-[#00ffcc]/10 px-1.5 py-0.5 rounded border border-[#00ffcc]/30 font-bold">
+              <span className="font-mono text-[8px] text-[#00ffff] bg-[#00ffff]/10 px-1.5 py-0.5 rounded border border-[#00ffff]/30 font-bold">
                 ACTIVE SYNC
               </span>
             </div>
@@ -1108,7 +1107,7 @@ export default function OmniStyleStudioNexus() {
               </div>
               <div className="rounded-lg bg-[#000000] p-2 border border-[#1f1638]">
                 <span className="text-slate-500 block text-[8px]">PRECIPITATION</span>
-                <span className="text-[#00ffcc] font-bold">{weatherData.precipitation}</span>
+                <span className="text-[#00ffff] font-bold">{weatherData.precipitation}</span>
               </div>
               <div className="rounded-lg bg-[#000000] p-2 border border-[#1f1638]">
                 <span className="text-slate-500 block text-[8px]">ATMOSPHERE</span>
@@ -1128,8 +1127,8 @@ export default function OmniStyleStudioNexus() {
       ======================================================== */}
       <footer className="h-7 shrink-0 flex items-center justify-between border-t border-[#1f1638] bg-[#000000] px-4 font-mono text-[9px] text-slate-400 select-none z-30">
         <div className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#00ffcc] shadow-[0_0_6px_#00ffcc]" />
-          <span className="font-black text-[#00ffcc]">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#00ffff] shadow-[0_0_6px_#00ffff]" />
+          <span className="font-black text-[#00ffff]">
             [Nexus-Inference: Max-Speed / Local-Ollama Override]
           </span>
         </div>
@@ -1137,15 +1136,15 @@ export default function OmniStyleStudioNexus() {
         <div className="flex items-center gap-3">
           <span className="hidden sm:inline">AVATAR: MANNEQUIN-V4</span>
           <span className="hidden md:inline">FABRIC PHYSICS: RUNNING</span>
-          <span className="text-[#00ffcc]">LAYERS: {equippedGarments.length}</span>
+          <span className="text-[#00ffff]">LAYERS: {equippedGarments.length}</span>
           <span className="text-white font-bold">FPS: 60</span>
         </div>
       </footer>
 
       {/* Floating Toast Notice */}
       {toastMessage && (
-        <div className="fixed bottom-10 left-1/2 z-50 -translate-x-1/2 flex items-center gap-2 rounded-xl border border-[#00ffa3]/60 bg-[#120d24] px-4 py-2 text-xs font-mono text-[#00ffa3] shadow-[0_0_30px_rgba(0,255,163,0.3)] animate-in fade-in slide-in-from-bottom-2">
-          <Sparkles className="h-3.5 w-3.5 animate-pulse" />
+        <div className="fixed bottom-10 left-1/2 z-50 -translate-x-1/2 flex items-center gap-2 rounded-xl border border-[#0C00CA] bg-[#0a071b] px-4 py-2 text-xs font-mono text-[#00ffff] shadow-[0_0_30px_rgba(12,0,202,0.45)] animate-in fade-in slide-in-from-bottom-2">
+          <Sparkles className="h-3.5 w-3.5 text-[#00ffff] animate-pulse" />
           <span>{toastMessage}</span>
           <button
             onClick={() => setToastMessage("")}

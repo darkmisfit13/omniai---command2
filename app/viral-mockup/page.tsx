@@ -299,19 +299,19 @@ export default function ViralMockupPage() {
                   onDragLeave={() => setDragging(false)}
                   onDrop={acceptDrop}
                   className={`absolute left-2.5 right-2.5 top-9 bottom-3 overflow-hidden rounded-[22px] border border-[#1f1638] bg-[#000000] ${
-                    dragging ? "ring-2 ring-[#6366f1] shadow-[0_0_20px_rgba(99,102,241,0.5)]" : ""
+                    dragging ? "ring-2 ring-[#0C00CA] shadow-[0_0_20px_rgba(12,0,202,0.65)]" : ""
                   }`}
                 >
                   {/* Phone Pane Content Display */}
                   {phonePane === "Swipe Left" ? (
                     <div className="grid h-full place-items-center bg-[#000000] p-4 text-center">
                       <div className="space-y-2">
-                        <div className="mx-auto size-12 rounded-full border border-[#6366f1] bg-[#0a071b] flex items-center justify-center text-[#6366f1] font-mono text-sm">
+                        <div className="mx-auto size-12 rounded-full border border-[#0C00CA] bg-[#0a071b] flex items-center justify-center text-[#00ffff] font-mono text-sm shadow-[0_0_12px_rgba(12,0,202,0.4)]">
                           PRO
                         </div>
                         <h4 className="text-xs font-bold text-white">Creator Channel</h4>
                         <p className="text-[10px] text-slate-400">Swipe Left pane: Profile stats, bio, and pinned matrix reels.</p>
-                        <span className="inline-block font-mono text-[9px] px-2 py-0.5 rounded bg-[#1f1638] text-[#00ffcc]">
+                        <span className="inline-block font-mono text-[9px] px-2 py-0.5 rounded bg-[#1f1638] text-[#00ffff] font-bold">
                           Nexus Synced
                         </span>
                       </div>
@@ -319,12 +319,12 @@ export default function ViralMockupPage() {
                   ) : phonePane === "Swipe Right" ? (
                     <div className="grid h-full place-items-center bg-[#000000] p-4 text-center">
                       <div className="space-y-2">
-                        <div className="mx-auto size-12 rounded-full border border-[#00ffcc] bg-[#0a071b] flex items-center justify-center text-[#00ffcc] font-mono text-sm">
+                        <div className="mx-auto size-12 rounded-full border border-[#00ffff] bg-[#0a071b] flex items-center justify-center text-[#00ffff] font-mono text-sm shadow-[0_0_12px_rgba(0,255,255,0.4)]">
                           ⚡
                         </div>
                         <h4 className="text-xs font-bold text-white">Interactive Matrix Feed</h4>
                         <p className="text-[10px] text-slate-400">Swipe Right pane: Community reactions, real-time tips &amp; stems.</p>
-                        <span className="inline-block font-mono text-[9px] px-2 py-0.5 rounded bg-[#1f1638] text-[#00ffcc]">
+                        <span className="inline-block font-mono text-[9px] px-2 py-0.5 rounded bg-[#1f1638] text-[#00ffff] font-bold">
                           Telemetry Active
                         </span>
                       </div>

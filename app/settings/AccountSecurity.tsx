@@ -10,11 +10,11 @@ import TwoFactorSetupModal from "./TwoFactorSetupModal";
 type Notice = { tone: NoticeTone; text: string } | null;
 
 const fieldClass =
-  "bg-transparent border border-ash/40 rounded px-3 py-2 outline-none focus:border-signal w-full";
+  "bg-[#000000] border border-[#1f1638] rounded-lg px-3 py-2 outline-none focus:border-[#0C00CA] focus:ring-1 focus:ring-[#0C00CA] w-full text-[#f1f0f7]";
 const buttonClass =
-  "bg-wine text-ink px-4 py-2 rounded hover:bg-wine/80 disabled:opacity-50 disabled:cursor-not-allowed";
+  "bg-[#0C00CA] text-white px-4 py-2 rounded-lg border border-[#3d2cf5] hover:bg-[#3d2cf5] shadow-[0_0_15px_rgba(12,0,202,0.45)] disabled:opacity-50 disabled:cursor-not-allowed";
 const smallButtonClass =
-  "text-xs text-signal hover:underline disabled:opacity-50 disabled:no-underline";
+  "text-xs text-[#00ffff] hover:underline disabled:opacity-50 disabled:no-underline font-mono";
 
 /**
  * Change password + two-factor authentication for the signed-in account.
@@ -191,7 +191,7 @@ export default function AccountSecurity() {
         </div>
       </div>
 
-      <div className="dms-rim-light dms-grain rounded-2xl border border-[#211d34] bg-[#14121f]/85 p-5 backdrop-blur-xl">
+      <div className="rounded-2xl border border-[#1f1638] bg-[#0a071b] p-5 shadow-[0_8px_30px_rgba(0,0,0,0.6)] backdrop-blur-xl">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h3 className="text-sm text-ash mb-1">Two-factor authentication</h3>
