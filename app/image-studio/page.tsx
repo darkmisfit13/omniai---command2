@@ -1149,15 +1149,17 @@ export default function OmniImageStudioNexus() {
           {/* =================================================================
               TELEMETRY LINE (ABSOLUTE BOTTOM MARGIN)
           ================================================================= */}
-          <footer className="z-20 flex items-center justify-between border-t border-[#35255e] bg-[#0d091a] px-4 py-2 font-mono text-[10px] text-[#9490ac]">
-            <div className="flex items-center gap-2 text-[#00ffa3]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#00ffa3] animate-ping" />
-              <span>[Nexus-Inference: Image-Engine / Local-Ollama Grid Active]</span>
+          <footer className="z-20 flex items-center justify-between border-t border-[#1f1638] bg-[#000000] px-4 py-2 font-mono text-[10px] text-slate-400">
+            <div className="flex items-center gap-2 text-[#00ffcc]">
+              <span className="h-2 w-2 rounded-full bg-[#00ffcc] shadow-[0_0_8px_#00ffcc] animate-pulse" />
+              <span className="font-bold tracking-tight">
+                [Nexus-Inference: Max-Speed / Local-Ollama Override] · [Image-Engine Grid Active]
+              </span>
             </div>
-            <div className="flex items-center gap-4">
-              <span>CANVAS PAN: X={Math.round(panX)} Y={Math.round(panY)}</span>
-              <span>ZOOM: {Math.round(zoomLevel * 100)}%</span>
-              <span>LAYERS: {layers.length} ACTIVE</span>
+            <div className="flex items-center gap-4 text-slate-400">
+              <span>CANVAS PAN: <strong className="text-white">X={Math.round(panX)} Y={Math.round(panY)}</strong></span>
+              <span>ZOOM: <strong className="text-[#00ffcc]">{Math.round(zoomLevel * 100)}%</strong></span>
+              <span>LAYERS: <strong className="text-[#00ffcc]">{layers.length} ACTIVE</strong></span>
             </div>
           </footer>
         </main>

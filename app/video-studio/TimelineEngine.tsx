@@ -66,7 +66,7 @@ const TRACKS_METADATA: TrackConfig[] = [
     id: "video1",
     name: "Video Track 01 (Primary)",
     type: "video",
-    color: "#a855f7",
+    color: "#0C00CA",
     muted: false,
     locked: false,
     opacity: 100,
@@ -75,7 +75,7 @@ const TRACKS_METADATA: TrackConfig[] = [
     id: "video2",
     name: "Overlay Video 02 (B-Roll)",
     type: "overlay",
-    color: "#c084fc",
+    color: "#3d2cf5",
     muted: false,
     locked: false,
     opacity: 85,
@@ -84,7 +84,7 @@ const TRACKS_METADATA: TrackConfig[] = [
     id: "captions",
     name: "Captions / Subtitles",
     type: "captions",
-    color: "#00ffa3",
+    color: "#00ffff",
     muted: false,
     locked: false,
     opacity: 100,
@@ -93,7 +93,7 @@ const TRACKS_METADATA: TrackConfig[] = [
     id: "audio",
     name: "Audio Sound Track",
     type: "audio",
-    color: "#00f2fe",
+    color: "#00ffff",
     muted: false,
     locked: false,
     opacity: 100,
@@ -487,24 +487,24 @@ export default function TimelineEngine({
             style={{ left: `${progressPercent}%` }}
           >
             {/* Playhead Handle */}
-            <div className="relative -top-0.5 h-3.5 w-3.5 -translate-x-1/2 rotate-45 rounded-sm bg-[#00ffa3] shadow-[0_0_12px_#00ffa3] border border-white" />
-            <div className="h-full w-0.5 bg-[#00ffa3] shadow-[0_0_12px_#00ffa3]" />
+            <div className="relative -top-0.5 h-3.5 w-3.5 -translate-x-1/2 rotate-45 rounded-sm bg-[#00ffff] shadow-[0_0_12px_#00ffff] border border-white" />
+            <div className="h-full w-0.5 bg-[#00ffff] shadow-[0_0_12px_#00ffff]" />
           </div>
         </div>
       </div>
 
-      {/* System Telemetry Line at absolute bottom margin */}
-      <div className="flex h-7 shrink-0 items-center justify-between border-t border-[#2e2055] bg-[#07050d] px-4 font-mono text-[10px] text-slate-400">
+      {/* System Telemetry Line at absolute bottom margin (Baby Blue #00ffff) */}
+      <div className="flex h-7 shrink-0 items-center justify-between border-t border-[#1f1638] bg-[#000000] px-4 font-mono text-[10px] text-slate-400">
         <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-[#00ffa3] animate-pulse" />
-          <span className="font-semibold text-[#00ffa3] tracking-wide">
-            [Nexus-Media-Engine: WebCodecs Local-GPU Export Pipeline / Zero-Cloud-Cost Active]
+          <span className="h-2 w-2 rounded-full bg-[#00ffff] shadow-[0_0_8px_#00ffff] animate-pulse" />
+          <span className="font-bold text-[#00ffff] tracking-wide">
+            [Nexus-Inference: Max-Speed / Local-Ollama Override] · [WebCodecs Local-GPU Active]
           </span>
         </div>
         <div className="flex items-center gap-4 text-slate-400">
-          <span>PIPELINE: VULKAN/WEBGPU</span>
-          <span>LATENCY: 4.2ms</span>
-          <span className="text-[#00ffa3]">WHISPER-LOCAL: ARMED</span>
+          <span>PIPELINE: <strong className="text-white">VULKAN/WEBGPU</strong></span>
+          <span>LATENCY: <strong className="text-[#00ffff]">4.2ms</strong></span>
+          <span className="text-[#00ffff] font-bold">WHISPER-LOCAL: ARMED</span>
         </div>
       </div>
     </div>

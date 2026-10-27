@@ -1052,65 +1052,65 @@ export default function OmniStyleStudioNexus() {
             </div>
 
             {/* Schedule Item Input */}
-            <div className="rounded-lg border border-[#2e2055] bg-[#0c0919] p-2 text-[10px] font-mono text-slate-300">
-              <span className="text-slate-500 block text-[8px] uppercase">Upcoming Schedule Node:</span>
-              <span className="text-[#00ffa3] font-semibold">{recommendationSchedule}</span>
+            <div className="rounded-lg border border-[#1f1638] bg-[#0a071b] p-2 text-[10px] font-mono text-slate-300">
+              <span className="text-slate-500 block text-[8px] uppercase font-mono">Upcoming Schedule Node:</span>
+              <span className="text-[#00ffcc] font-bold">{recommendationSchedule}</span>
             </div>
 
-            {/* Tri-Agent Council 3 Voice Blocks */}
+            {/* Tri-Agent Council 3 Voice Blocks (All Strings in Vibrant Neon Green #00ffcc) */}
             <div className="space-y-2 font-mono text-[9px] leading-relaxed">
               {/* Strategist */}
-              <div className="rounded-lg border border-[#2e2055] bg-[#16112c] p-2 space-y-0.5">
-                <span className="font-bold text-[#00ffa3] uppercase block">
+              <div className="rounded-lg border border-[#1f1638] bg-[#0a071b] p-2.5 space-y-1">
+                <span className="font-extrabold text-[#00ffcc] uppercase block tracking-wider drop-shadow-[0_0_8px_rgba(0,255,204,0.4)]">
                   [1. THE STRATEGIST] // STRUCTURAL &amp; FABRIC PERFORMANCE
                 </span>
-                <p className="text-slate-300">{triAgentLog.strategist}</p>
+                <p className="text-slate-200">{triAgentLog.strategist}</p>
               </div>
 
               {/* Empath */}
-              <div className="rounded-lg border border-[#2e2055] bg-[#16112c] p-2 space-y-0.5">
-                <span className="font-bold text-purple-300 uppercase block">
+              <div className="rounded-lg border border-[#1f1638] bg-[#0a071b] p-2.5 space-y-1">
+                <span className="font-extrabold text-[#00ffcc] uppercase block tracking-wider drop-shadow-[0_0_8px_rgba(0,255,204,0.4)]">
                   [2. THE EMPATH] // HEARTBREAK &amp; EMOTIONAL RESONANCE
                 </span>
-                <p className="text-slate-300">{triAgentLog.empath}</p>
+                <p className="text-slate-200">{triAgentLog.empath}</p>
               </div>
 
               {/* Ghost */}
-              <div className="rounded-lg border border-[#2e2055] bg-[#16112c] p-2 space-y-0.5">
-                <span className="font-bold text-[#00f2fe] uppercase block">
+              <div className="rounded-lg border border-[#1f1638] bg-[#0a071b] p-2.5 space-y-1">
+                <span className="font-extrabold text-[#00ffcc] uppercase block tracking-wider drop-shadow-[0_0_8px_rgba(0,255,204,0.4)]">
                   [3. THE GHOST] // CYBERPUNK AVANT-GARDE EDGE
                 </span>
-                <p className="text-slate-300">{triAgentLog.ghost}</p>
+                <p className="text-slate-200">{triAgentLog.ghost}</p>
               </div>
             </div>
           </div>
 
           {/* 3. Live Environment Sync Line */}
-          <div className="rounded-xl border border-[#2e2055] bg-[#120d24] p-3 space-y-2">
+          <div className="rounded-xl border border-[#1f1638] bg-[#0a071b] p-3 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-[10px] uppercase tracking-wider text-slate-300 font-bold flex items-center gap-1.5">
-                <CloudRain className="h-3 w-3 text-[#00ffa3]" />
+              <span className="font-mono text-[10px] uppercase tracking-wider text-white font-bold flex items-center gap-1.5">
+                <CloudRain className="h-3 w-3 text-[#00ffcc]" />
                 Live Environment Weather Sync
               </span>
-              <span className="font-mono text-[8px] text-[#00ffa3] bg-[#00ffa3]/10 px-1.5 py-0.5 rounded border border-[#00ffa3]/30">
+              <span className="font-mono text-[8px] text-[#00ffcc] bg-[#00ffcc]/10 px-1.5 py-0.5 rounded border border-[#00ffcc]/30 font-bold">
                 ACTIVE SYNC
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-2 font-mono text-[9px]">
-              <div className="rounded-lg bg-black/50 p-2 border border-[#2e2055]">
+              <div className="rounded-lg bg-[#000000] p-2 border border-[#1f1638]">
                 <span className="text-slate-500 block text-[8px]">FELT TEMPERATURE</span>
                 <span className="text-white font-bold">{weatherData.temperature}</span>
               </div>
-              <div className="rounded-lg bg-black/50 p-2 border border-[#2e2055]">
+              <div className="rounded-lg bg-[#000000] p-2 border border-[#1f1638]">
                 <span className="text-slate-500 block text-[8px]">HUMIDITY</span>
                 <span className="text-white font-bold">{weatherData.humidity}</span>
               </div>
-              <div className="rounded-lg bg-black/50 p-2 border border-[#2e2055]">
+              <div className="rounded-lg bg-[#000000] p-2 border border-[#1f1638]">
                 <span className="text-slate-500 block text-[8px]">PRECIPITATION</span>
-                <span className="text-[#00ffa3] font-bold">{weatherData.precipitation}</span>
+                <span className="text-[#00ffcc] font-bold">{weatherData.precipitation}</span>
               </div>
-              <div className="rounded-lg bg-black/50 p-2 border border-[#2e2055]">
+              <div className="rounded-lg bg-[#000000] p-2 border border-[#1f1638]">
                 <span className="text-slate-500 block text-[8px]">ATMOSPHERE</span>
                 <span className="text-slate-300 font-bold truncate">{weatherData.condition}</span>
               </div>
@@ -1126,18 +1126,18 @@ export default function OmniStyleStudioNexus() {
       {/* ========================================================
           TELEMETRY LINE TRACKER (ABSOLUTE BOTTOM MARGIN)
       ======================================================== */}
-      <footer className="h-7 shrink-0 flex items-center justify-between border-t border-[#2e2055] bg-[#07050d] px-4 font-mono text-[9px] text-slate-400 select-none z-30">
+      <footer className="h-7 shrink-0 flex items-center justify-between border-t border-[#1f1638] bg-[#000000] px-4 font-mono text-[9px] text-slate-400 select-none z-30">
         <div className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#00ffa3] shadow-[0_0_6px_#00ffa3]" />
-          <span className="font-black text-[#00ffa3]">
-            [Nexus-Style: PyTorch Edge Segmentation / WebGL Apparel Canvas Active]
+          <span className="h-1.5 w-1.5 rounded-full bg-[#00ffcc] shadow-[0_0_6px_#00ffcc]" />
+          <span className="font-black text-[#00ffcc]">
+            [Nexus-Inference: Max-Speed / Local-Ollama Override]
           </span>
         </div>
 
         <div className="flex items-center gap-3">
           <span className="hidden sm:inline">AVATAR: MANNEQUIN-V4</span>
           <span className="hidden md:inline">FABRIC PHYSICS: RUNNING</span>
-          <span className="text-[#00ffa3]">LAYERS: {equippedGarments.length}</span>
+          <span className="text-[#00ffcc]">LAYERS: {equippedGarments.length}</span>
           <span className="text-white font-bold">FPS: 60</span>
         </div>
       </footer>

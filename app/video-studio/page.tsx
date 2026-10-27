@@ -41,7 +41,7 @@ import {
 } from "lucide-react";
 import ViewportCanvas, { type ShaderEffect } from "./ViewportCanvas";
 import TimelineEngine, { type TimelineClip } from "./TimelineEngine";
-import { mediaVault, type VaultAsset } from "@/lib/mediaVault";
+import { mediaVault, audioStemBridge, type VaultAsset } from "@/lib/mediaVault";
 
 // Preset Media Assets for Asset Management Vault
 interface VaultMediaItem {
@@ -189,15 +189,15 @@ interface ExportPreset {
 
 const EXPORT_PRESETS: ExportPreset[] = [
   {
-    id: "social_1080x1920",
-    name: "Social Media Vertical Reel",
-    resolution: "1080x1920",
+    id: "social_media",
+    name: "Social Media",
+    resolution: "1080x1920 (9:16) / 1920x1080 (16:9)",
     aspectRatio: "9:16",
     platform: "TikTok / IG Reels / YouTube Shorts",
     container: ".mp4",
     codec: "H.265 / HEVC GPU Hardware",
-    description: "Full-bleed 9:16 portrait video optimized for algorithmic social feeds & mobile screens.",
-    badge: "NEW PRESET",
+    description: "Quickly toggle between 9:16 vertical and 16:9 landscape aspect ratios for TikTok, Instagram Reels, and YouTube Shorts.",
+    badge: "9:16 / 16:9 DUAL PRESET",
   },
   {
     id: "cinema_4k",
@@ -283,7 +283,8 @@ export default function VideoStudioPage() {
   const [notice, setNotice] = useState<string>("");
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const [showShortcutsModal, setShowShortcutsModal] = useState<boolean>(false);
-  const [exportPreset, setExportPreset] = useState<string>("social_1080x1920");
+  const [exportPreset, setExportPreset] = useState<string>("social_media");
+  const [socialOrientation, setSocialOrientation] = useState<"9:16" | "16:9">("9:16");
 
   // Playback Timer
   useEffect(() => {
@@ -313,12 +314,70 @@ export default function VideoStudioPage() {
     return matched?.text || "";
   }, [clips, currentTime]);
 
-  const triggerNotice = (msg: string) => {
+  const triggerNotice = useCallback((msg: string) => {
     setNotice(msg);
     setTimeout(() => {
       setNotice((prev) => (prev === msg ? "" : prev));
-    }, 4000);
-  };
+    }, 4500);
+  }, []);
+
+  // Unified State Mechanism: Import audio stems exported from Music Studio
+  const importStemToTimeline = useCallback((stem: any) => {
+    if (!stem) return;
+    const stemClipId = `stem-${Date.now()}`;
+    const newAudioClip: TimelineClip = {
+      id: stemClipId,
+      trackId: "audio",
+      title: stem.title || "Music Studio Master Stem",
+      startTime: 0,
+      duration: stem.duration || 60,
+      color: "#00ffff", // Baby Blue
+    };
+
+    setClips((prev) => {
+      const filtered = prev.filter((c) => c.id !== stemClipId);
+      return [...filtered, newAudioClip];
+    });
+    setSelectedClipId(stemClipId);
+
+    // Add to vault items list
+    setVaultItems((prev) => [
+      {
+        id: stem.id || stemClipId,
+        name: stem.title || "Music Studio Stem (48kHz)",
+        type: "audio",
+        format: ".wav",
+        duration: stem.duration || 60,
+        thumbnailUrl: "/stems_thumb.jpg",
+        source: "Music Studio Stem Export",
+      },
+      ...prev,
+    ]);
+
+    triggerNotice(`✓ Instantly imported audio stem: "${stem.title}" into Timeline!`);
+  }, [triggerNotice]);
+
+  // Listen for audio stem export events and auto-consume pending stems
+  useEffect(() => {
+    const handleStemExported = (e: any) => {
+      if (e.detail) {
+        importStemToTimeline(e.detail);
+      }
+    };
+
+    window.addEventListener("omniai_audio_stem_exported", handleStemExported);
+
+    // Check if there is an unconsumed stem from Music Studio
+    const pending = audioStemBridge.getPendingImportedStem();
+    if (pending) {
+      importStemToTimeline(pending);
+      audioStemBridge.consumePendingStem();
+    }
+
+    return () => {
+      window.removeEventListener("omniai_audio_stem_exported", handleStemExported);
+    };
+  }, [importStemToTimeline]);
 
   // Play / Pause Handlers
   const handleTogglePlay = () => {
@@ -540,15 +599,24 @@ export default function VideoStudioPage() {
     const targetId = overridePresetId || exportPreset;
     const activePreset = EXPORT_PRESETS.find((p) => p.id === targetId) || EXPORT_PRESETS[0];
 
-    // Automatically adjust aspect ratio if social media vertical is chosen
-    if (activePreset.aspectRatio !== "Audio") {
-      setAspectRatio(activePreset.aspectRatio);
+    const effectiveAspectRatio: "16:9" | "9:16" | "1:1" | "21:9" | "Audio" =
+      activePreset.id === "social_media" ? socialOrientation : activePreset.aspectRatio;
+    const effectiveResolution =
+      activePreset.id === "social_media"
+        ? socialOrientation === "9:16"
+          ? "1080x1920 (9:16 Vertical)"
+          : "1920x1080 (16:9 Landscape)"
+        : activePreset.resolution;
+
+    // Automatically adjust aspect ratio if not audio
+    if (effectiveAspectRatio !== "Audio") {
+      setAspectRatio(effectiveAspectRatio as any);
     }
 
     setIsExporting(true);
     setExportProgress(8);
     setShowExportModal(true);
-    triggerNotice(`Exporting via WebCodecs Local-GPU: [${activePreset.name}] (${activePreset.resolution})...`);
+    triggerNotice(`Exporting via WebCodecs Local-GPU: [${activePreset.name}] (${effectiveResolution})...`);
 
     const interval = setInterval(() => {
       setExportProgress((p) => {
@@ -557,7 +625,7 @@ export default function VideoStudioPage() {
           setTimeout(() => {
             setIsExporting(false);
             setExportProgress(100);
-            triggerNotice(`Export Complete! ${activePreset.name} (${activePreset.resolution}) ready for dispatch.`);
+            triggerNotice(`Export Complete! ${activePreset.name} (${effectiveResolution}) ready for dispatch.`);
           }, 600);
           return 100;
         }
@@ -755,37 +823,64 @@ export default function VideoStudioPage() {
         {/* Left Column (25% Width): Asset Management Vault */}
         <div className="col-span-3 flex flex-col h-full overflow-hidden bg-[#0a0714] p-3">
           {/* Vault Header & Global Pull Tab */}
-          <div className="flex items-center justify-between border-b border-[#2e2055] pb-2">
+          <div className="flex items-center justify-between border-b border-[#1f1638] pb-2">
             <div>
-              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#00ffa3] font-bold">
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#00ffff] font-bold">
                 TIER 1 // ASSET VAULT
               </p>
               <h3 className="text-xs font-bold text-white tracking-wide">
-                Media Browser & Swapper
+                Media Browser &amp; Stems
               </h3>
             </div>
 
-            {/* Global Pull Tab Button */}
-            <button
-              onClick={handlePullGlobalVault}
-              disabled={isPullingGlobalVault}
-              className="flex items-center gap-1 rounded-lg border border-[#00ffa3]/40 bg-[#00ffa3]/10 px-2 py-1 font-mono text-[9px] font-bold text-[#00ffa3] hover:bg-[#00ffa3]/20 transition shadow-[0_0_10px_rgba(0,255,163,0.15)]"
-              title="Instantly swap & sync media straight from OpenGlobalVault"
-            >
-              <FolderDown className={`h-3 w-3 ${isPullingGlobalVault ? "animate-spin" : ""}`} />
-              <span>Pull Global Vault</span>
-            </button>
+            <div className="flex items-center gap-1.5">
+              {/* Sync Stems Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  const history = audioStemBridge.getExportedStemsHistory();
+                  const pending = audioStemBridge.getPendingImportedStem();
+                  const targetStem = pending || (history.length > 0 ? history[0] : null);
+                  if (targetStem) {
+                    importStemToTimeline(targetStem);
+                    audioStemBridge.consumePendingStem();
+                  } else {
+                    importStemToTimeline({
+                      title: "Omni Master 48kHz Synth Stem",
+                      bpm: 128,
+                      duration: 60,
+                    });
+                  }
+                }}
+                className="flex items-center gap-1 rounded-lg border border-[#00ffff]/40 bg-[#00ffff]/10 px-2 py-1 font-mono text-[9px] font-bold text-[#00ffff] hover:bg-[#00ffff]/20 transition shadow-[0_0_10px_rgba(0,255,255,0.2)]"
+                title="Instantly import audio tracks & stems exported from Music Studio"
+              >
+                <Music className="h-3 w-3" />
+                <span>Import Music Stems</span>
+              </button>
+
+              {/* Global Pull Tab Button */}
+              <button
+                onClick={handlePullGlobalVault}
+                disabled={isPullingGlobalVault}
+                className="flex items-center gap-1 rounded-lg border border-[#0C00CA] bg-[#0C00CA]/25 px-2 py-1 font-mono text-[9px] font-bold text-white hover:bg-[#0C00CA]/50 transition shadow-[0_0_10px_rgba(12,0,202,0.35)]"
+                title="Instantly swap & sync media straight from OpenGlobalVault"
+              >
+                <FolderDown className={`h-3 w-3 ${isPullingGlobalVault ? "animate-spin" : ""}`} />
+                <span>Global Vault</span>
+              </button>
+            </div>
           </div>
 
           {/* Filter Tabs */}
-          <div className="mt-2 flex items-center gap-1 rounded-lg border border-[#2e2055] bg-[#120d24] p-0.5 font-mono text-[9px]">
+          <div className="mt-2 flex items-center gap-1 rounded-lg border border-[#1f1638] bg-[#000000] p-0.5 font-mono text-[9px]">
             {(["all", "video", "image", "audio"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setVaultFilter(tab)}
                 className={`flex-1 rounded py-1 capitalize transition ${
                   vaultFilter === tab
-                    ? "bg-[#00ffa3]/20 text-[#00ffa3] font-bold border border-[#00ffa3]/40"
+                    ? "bg-[#0C00CA] text-white font-bold border border-[#0C00CA] shadow-[0_0_10px_rgba(12,0,202,0.4)]"
                     : "text-slate-400 hover:text-white"
                 }`}
               >
@@ -1067,18 +1162,18 @@ export default function VideoStudioPage() {
           EXPORT & DISPATCH TERMINAL MODAL (WITH SOCIAL MEDIA PRESET)
       ======================================================== */}
       {showExportModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
-          <div className="relative w-full max-w-2xl rounded-2xl border border-[#2e2055] bg-[#0c0919] p-6 shadow-[0_0_50px_rgba(0,0,0,0.9)] space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+          <div className="relative w-full max-w-2xl rounded-2xl border border-[#1f1638] bg-[#0a071b] p-6 shadow-[0_0_50px_rgba(12,0,202,0.35)] space-y-5">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-[#2e2055] pb-3">
+            <div className="flex items-center justify-between border-b border-[#1f1638] pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="flex size-8 items-center justify-center rounded-lg border border-[#00ffa3]/40 bg-[#00ffa3]/10 text-[#00ffa3]">
+                <div className="flex size-8 items-center justify-center rounded-lg border border-[#00ffff]/40 bg-[#00ffff]/10 text-[#00ffff]">
                   <Download className="size-4" />
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
                     Export &amp; Dispatch Terminal
-                    <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-[#00ffa3]/15 text-[#00ffa3] border border-[#00ffa3]/30">
+                    <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-[#00ffff]/15 text-[#00ffff] border border-[#00ffff]/30">
                       WebCodecs GPU HW
                     </span>
                   </h3>
@@ -1097,49 +1192,98 @@ export default function VideoStudioPage() {
 
             {/* Presets List */}
             <div className="space-y-2">
-              <label className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">
+              <label className="text-[10px] font-mono uppercase tracking-wider text-[#00ffff] font-semibold">
                 Available Aspect Ratio &amp; Platform Presets:
               </label>
               <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto pr-1">
                 {EXPORT_PRESETS.map((preset) => {
                   const isSelected = exportPreset === preset.id;
+                  const isSocialMedia = preset.id === "social_media";
+
                   return (
                     <div
                       key={preset.id}
                       onClick={() => setExportPreset(preset.id)}
-                      className={`p-3 rounded-xl border cursor-pointer transition flex items-center justify-between ${
+                      className={`p-3 rounded-xl border cursor-pointer transition flex flex-col gap-2 ${
                         isSelected
-                          ? "border-[#00ffa3] bg-[#00ffa3]/10 shadow-[0_0_15px_rgba(0,255,163,0.15)]"
-                          : "border-[#2e2055] bg-[#120d24] hover:border-[#00ffa3]/40 hover:bg-[#16112c]"
+                          ? "border-[#0C00CA] bg-[#0C00CA]/20 shadow-[0_0_20px_rgba(12,0,202,0.45)]"
+                          : "border-[#1f1638] bg-[#070514] hover:border-[#0C00CA]/60 hover:bg-[#0e072b]"
                       }`}
                     >
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-white">{preset.name}</span>
-                          <span className="font-mono text-[10px] font-bold text-[#00ffa3]">
-                            {preset.resolution}
-                          </span>
-                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#1f173b] text-slate-300">
-                            {preset.aspectRatio}
-                          </span>
-                          {preset.badge && (
-                            <span className="text-[8px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#00ffa3] text-black shadow-[0_0_8px_#00ffa3]">
-                              {preset.badge}
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-white">{preset.name}</span>
+                            <span className="font-mono text-[10px] font-bold text-[#00ffff]">
+                              {isSocialMedia
+                                ? (socialOrientation === "9:16" ? "1080x1920 (9:16)" : "1920x1080 (16:9)")
+                                : preset.resolution}
                             </span>
-                          )}
+                            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#1f1638] text-slate-300">
+                              {isSocialMedia ? socialOrientation : preset.aspectRatio}
+                            </span>
+                            {preset.badge && (
+                              <span className="text-[8px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#00ffff] text-black shadow-[0_0_8px_#00ffff]">
+                                {preset.badge}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-slate-300">{preset.description}</p>
+                          <div className="flex items-center gap-3 text-[9px] font-mono text-slate-400 pt-0.5">
+                            <span>Codec: <strong className="text-slate-200">{preset.codec}</strong></span>
+                            <span>·</span>
+                            <span>Format: <strong className="text-slate-200">{preset.container}</strong></span>
+                            <span>·</span>
+                            <span>Target: <strong className="text-slate-200">{preset.platform}</strong></span>
+                          </div>
                         </div>
-                        <p className="text-[10px] text-slate-400">{preset.description}</p>
-                        <div className="flex items-center gap-3 text-[9px] font-mono text-slate-500 pt-0.5">
-                          <span>Codec: <strong className="text-slate-300">{preset.codec}</strong></span>
-                          <span>·</span>
-                          <span>Format: <strong className="text-slate-300">{preset.container}</strong></span>
-                          <span>·</span>
-                          <span>Target: <strong className="text-slate-300">{preset.platform}</strong></span>
+                        <div className="size-4 rounded-full border border-[#1f1638] flex items-center justify-center shrink-0">
+                          {isSelected && <div className="size-2 rounded-full bg-[#00ffff] shadow-[0_0_6px_#00ffff]" />}
                         </div>
                       </div>
-                      <div className="size-4 rounded-full border border-slate-600 flex items-center justify-center">
-                        {isSelected && <div className="size-2 rounded-full bg-[#00ffa3]" />}
-                      </div>
+
+                      {/* Interactive Social Media Aspect Ratio Switcher (9:16 Vertical vs 16:9 Landscape) */}
+                      {isSocialMedia && (
+                        <div className="mt-1 pt-2 border-t border-[#1f1638] flex items-center justify-between">
+                          <span className="text-[9px] font-mono uppercase text-[#00ffff] font-semibold">
+                            Orientation Mode:
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSocialOrientation("9:16");
+                                setAspectRatio("9:16");
+                                setExportPreset("social_media");
+                              }}
+                              className={`px-2.5 py-1 rounded-lg text-[9px] font-mono font-bold transition border ${
+                                socialOrientation === "9:16"
+                                  ? "bg-[#0C00CA] border-[#0C00CA] text-white shadow-[0_0_14px_rgba(12,0,202,0.6)]"
+                                  : "bg-[#0a071b] border-[#1f1638] text-slate-400 hover:text-white hover:border-[#0C00CA]"
+                              }`}
+                            >
+                              9:16 Vertical (1080x1920)
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSocialOrientation("16:9");
+                                setAspectRatio("16:9");
+                                setExportPreset("social_media");
+                              }}
+                              className={`px-2.5 py-1 rounded-lg text-[9px] font-mono font-bold transition border ${
+                                socialOrientation === "16:9"
+                                  ? "bg-[#0C00CA] border-[#0C00CA] text-white shadow-[0_0_14px_rgba(12,0,202,0.6)]"
+                                  : "bg-[#0a071b] border-[#1f1638] text-slate-400 hover:text-white hover:border-[#0C00CA]"
+                              }`}
+                            >
+                              16:9 Landscape (1920x1080)
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -1148,17 +1292,17 @@ export default function VideoStudioPage() {
 
             {/* Real-Time Visual Progress Bar */}
             {isExporting && (
-              <div className="space-y-2 rounded-xl border border-[#00ffa3]/40 bg-[#00ffa3]/5 p-3">
+              <div className="space-y-2 rounded-xl border border-[#00ffff]/40 bg-[#00ffff]/5 p-3">
                 <div className="flex items-center justify-between text-xs font-mono">
                   <span className="text-white flex items-center gap-2">
-                    <RefreshCw className="size-3.5 animate-spin text-[#00ffa3]" />
+                    <RefreshCw className="size-3.5 animate-spin text-[#00ffff]" />
                     Encoding Frames...
                   </span>
-                  <span className="text-[#00ffa3] font-bold">{exportProgress}%</span>
+                  <span className="text-[#00ffff] font-bold">{exportProgress}%</span>
                 </div>
-                <div className="w-full bg-[#1c1538] h-2 rounded-full overflow-hidden">
+                <div className="w-full bg-[#1f1638] h-2 rounded-full overflow-hidden">
                   <div
-                    className="bg-[#00ffa3] h-full transition-all duration-300 shadow-[0_0_10px_#00ffa3]"
+                    className="bg-[#00ffff] h-full transition-all duration-300 shadow-[0_0_10px_#00ffff]"
                     style={{ width: `${exportProgress}%` }}
                   />
                 </div>
@@ -1169,26 +1313,27 @@ export default function VideoStudioPage() {
             )}
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-between pt-2 border-t border-[#2e2055]">
+            <div className="flex items-center justify-between pt-2 border-t border-[#1f1638]">
               <div className="text-[10px] font-mono text-slate-400">
                 Preset Selected:{" "}
-                <span className="text-[#00ffa3] font-bold">
+                <span className="text-[#00ffff] font-bold">
                   {EXPORT_PRESETS.find((p) => p.id === exportPreset)?.name}
+                  {exportPreset === "social_media" && ` (${socialOrientation})`}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setShowExportModal(false)}
-                  className="px-4 py-2 rounded-xl border border-[#2e2055] text-xs font-semibold text-slate-400 hover:text-white hover:bg-[#120d24] transition"
+                  className="px-4 py-2 rounded-xl border border-[#1f1638] text-xs font-semibold text-slate-400 hover:text-white hover:bg-[#130d32] transition"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => handleExportVideo(exportPreset)}
                   disabled={isExporting}
-                  className="px-5 py-2 rounded-xl bg-[#00ffa3] text-black font-black text-xs uppercase tracking-wider hover:bg-[#39ffb4] transition shadow-[0_0_15px_rgba(0,255,163,0.3)] disabled:opacity-50 flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-xl bg-[#0C00CA] text-white font-bold text-xs uppercase tracking-wider hover:bg-[#1d08e0] transition shadow-[0_0_20px_rgba(12,0,202,0.5)] disabled:opacity-50 flex items-center gap-1.5"
                 >
-                  <Download className="size-3.5" />
+                  <Download className="size-3.5 text-[#00ffff]" />
                   <span>{isExporting ? `Rendering (${exportProgress}%)` : "Start GPU Export"}</span>
                 </button>
               </div>

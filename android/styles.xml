@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dark Misfit Studios - OmniAI Nexus Android Stylesheet -->
+<!-- Absolute Black Cyberpunk: Pure Shiny Black (#000000), Obsidian-Purple (#0A071B), Purplish-Blue (#0C00CA), Baby Blue (#00FFFF) -->
+<resources>
+    <!-- Base Application Theme -->
+    <style name="Theme.OmniAI.Nexus" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- 1. Canvas Base: Pure Shiny Black -->
+        <item name="android:windowBackground">#000000</item>
+        <item name="android:colorBackground">#000000</item>
+        
+        <!-- Surface Containers: Rich Obsidian-Purple -->
+        <item name="colorSurface">#0A071B</item>
+        <item name="colorSurfaceVariant">#110B29</item>
+        <item name="android:navigationBarColor">#000000</item>
+        <item name="android:statusBarColor">#000000</item>
+        <item name="android:windowLightStatusBar">false</item>
+        
+        <!-- 2. Primary Accents: Signature Purplish-Blue (#0C00CA) -->
+        <item name="colorPrimary">#0C00CA</item>
+        <item name="colorPrimaryVariant">#1D08E0</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        
+        <!-- 3. Telemetry & Metrics: Baby Blue (#00FFFF) -->
+        <item name="colorSecondary">#00FFFF</item>
+        <item name="colorSecondaryVariant">#00D2FF</item>
+        <item name="colorOnSecondary">#000000</item>
+        
+        <!-- Borders & Dividers -->
+        <item name="colorOutline">#1F1638</item>
+    </style>
+</resources>

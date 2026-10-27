@@ -1113,8 +1113,8 @@ ${sendQuery}`;
             </div>
           </section>
 
-          <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#302947] bg-[#0e0c18]/90 shadow-[0_12px_48px_rgba(0,0,0,0.16)]">
-            <div className="chat-topbar d3-bar">
+          <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#1f1638] bg-[#0a071b] shadow-[0_12px_48px_rgba(0,0,0,0.8)]">
+            <div className="chat-topbar d3-bar border-b border-[#1f1638] bg-[#000000]">
               <div className="chat-topbar__status">
                 <span
                   className={`chat-topbar__dot ${loading ? "is-busy" : ""}`}
@@ -1123,8 +1123,8 @@ ${sendQuery}`;
                 {loading ? "Processing" : historyLoaded ? "Ready" : "Loading"}
               </div>
 
-              <span className="chat-topbar__meta dms-mono">
-                {messages.length} MSG
+              <span className="chat-topbar__meta dms-mono text-[#00ffcc]">
+                [Nexus-Inference: Max-Speed / Local-Ollama Override] · {messages.length} MSG
                 {activeSkills.length > 0 &&
                   ` · ${activeSkills.length} SKILL${activeSkills.length === 1 ? "" : "S"}`}
               </span>
@@ -1132,11 +1132,11 @@ ${sendQuery}`;
 
         <div
           ref={conversationRef}
-          className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain p-4 sm:p-6"
+          className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain p-4 sm:p-6 bg-[#000000]"
           aria-label="Conversation messages"
         >
           {!historyLoaded && (
-            <p className="rounded-xl border border-[#211d34] bg-[#14121f] p-4 text-sm text-[#9490ac]">
+            <p className="rounded-xl border border-[#1f1638] bg-[#0a071b] p-4 text-sm text-[#9490ac]">
               Loading your conversation history...
             </p>
           )}
@@ -1157,7 +1157,7 @@ ${sendQuery}`;
                     key={suggestion}
                     type="button"
                     onClick={() => setQuery(suggestion)}
-                    className="omni-suggestion-button rounded-xl border border-[#393252] bg-[#171426] px-3.5 py-2 text-xs font-mono text-slate-200 transition hover:border-[#00ffa3] hover:bg-[#00ffa3]/10 hover:text-[#00ffa3] shadow-md"
+                    className="omni-suggestion-button rounded-xl border border-[#1f1638] bg-[#0a071b] px-3.5 py-2 text-xs font-mono text-slate-200 transition hover:border-[#6366f1] hover:bg-[#6366f1]/15 hover:text-[#00ffcc] hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] shadow-md"
                   >
                     {suggestion}
                   </button>

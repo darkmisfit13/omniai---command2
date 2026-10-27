@@ -177,9 +177,9 @@ export default function StudioVoiceAssistantOverlay() {
             <button
               key={idx}
               onClick={() => handleSend(action.prompt)}
-              className="shrink-0 flex items-center gap-1 rounded-lg border border-[#2e2055] bg-[#16112c] px-2.5 py-1 font-mono text-[10px] text-slate-300 hover:border-[#00D2FF] hover:text-[#00D2FF] transition"
+              className="shrink-0 flex items-center gap-1 rounded-lg border border-[#1f1638] bg-[#0a071b] px-2.5 py-1 font-mono text-[10px] text-slate-300 hover:border-[#6366f1] hover:text-[#00ffcc] transition"
             >
-              <Sparkles className="h-2.5 w-2.5 text-[#00D2FF]" />
+              <Sparkles className="h-2.5 w-2.5 text-[#00ffcc]" />
               <span>{action.label}</span>
             </button>
           ))}
@@ -200,21 +200,22 @@ export default function StudioVoiceAssistantOverlay() {
               <div
                 className={`max-w-[85%] rounded-xl px-3.5 py-2.5 shadow-md ${
                   msg.sender === "user"
-                    ? "bg-[#6c63ff] text-white border border-[#8b7fff]"
-                    : "bg-[#16112c] text-slate-200 border border-[#2e2055]"
+                    ? "bg-[#6366f1] text-white border border-[#6366f1] shadow-[0_0_15px_rgba(99,102,241,0.3)]"
+                    : "bg-[#0a071b] text-slate-200 border border-[#1f1638]"
                 }`}
               >
-                <div className="flex items-center gap-2 mb-1 opacity-70 text-[9px]">
-                  <span>{msg.sender === "user" ? "CREATIVE DIRECTOR" : "OMNIAI - NEXUS CORE"}</span>
+                <div className="flex items-center gap-2 mb-1 opacity-75 text-[9px]">
+                  <span className="font-bold text-white">{msg.sender === "user" ? "CREATIVE DIRECTOR" : "OMNIAI - NEXUS CORE"}</span>
                   <span>·</span>
                   <span>{new Date(msg.timestamp).toLocaleTimeString()}</span>
                 </div>
                 <p className="leading-relaxed">{msg.text}</p>
 
+                {/* Real-time Call Response Pills (Vibrant Neon Green #00ffcc) */}
                 {msg.actionExecuted && (
-                  <div className="mt-2 flex items-center gap-1.5 rounded-md border border-[#00D2FF]/40 bg-[#00D2FF]/10 px-2 py-0.5 text-[10px] text-[#00D2FF]">
-                    <CheckCircle2 className="h-3 w-3" />
-                    <span>Action: {msg.actionExecuted}</span>
+                  <div className="mt-2 flex items-center gap-1.5 rounded-lg border border-[#00ffcc]/50 bg-[#00ffcc]/15 px-2.5 py-1 text-[10px] font-bold text-[#00ffcc] shadow-[0_0_10px_rgba(0,255,204,0.25)]">
+                    <CheckCircle2 className="h-3 w-3 text-[#00ffcc]" />
+                    <span>RESPONSE: {msg.actionExecuted}</span>
                   </div>
                 )}
               </div>
@@ -222,21 +223,21 @@ export default function StudioVoiceAssistantOverlay() {
           ))}
 
           {state === "thinking" && (
-            <div className="flex items-center gap-2 text-rose-300 text-[11px]">
-              <span className="h-2 w-2 rounded-full bg-[#FF003C] animate-ping" />
-              <span>Routing through local Ollama & Python automation nodes…</span>
+            <div className="flex items-center gap-2 text-[#00ffcc] text-[11px] font-mono">
+              <span className="h-2 w-2 rounded-full bg-[#00ffcc] shadow-[0_0_8px_#00ffcc] animate-ping" />
+              <span>Routing through local Ollama &amp; Python automation nodes…</span>
             </div>
           )}
         </div>
 
         {/* Real-time Audio Reactive Visualizer Ribbon */}
         {state === "talking" && (
-          <div className="flex items-center justify-center gap-1 px-4 py-1.5 bg-[#120d24]/60 border-t border-[#2e2055]">
-            <span className="font-mono text-[9px] text-[#00D2FF] mr-2">VOICE SYNTHESIS:</span>
+          <div className="flex items-center justify-center gap-1 px-4 py-1.5 bg-[#0a071b] border-t border-[#1f1638]">
+            <span className="font-mono text-[9px] text-[#00ffcc] mr-2 font-bold">VOICE SYNTHESIS:</span>
             {audioFrequencies.map((f, i) => (
               <span
                 key={i}
-                className="w-1 rounded-full bg-[#00D2FF] shadow-[0_0_6px_#00D2FF]"
+                className="w-1 rounded-full bg-[#00ffcc] shadow-[0_0_6px_#00ffcc]"
                 style={{ height: `${Math.max(4, f * 18)}px` }}
               />
             ))}
@@ -244,13 +245,13 @@ export default function StudioVoiceAssistantOverlay() {
         )}
 
         {/* Command Input Deck */}
-        <div className="flex items-center gap-2 p-3 bg-[#0a0714] border-t border-[#2e2055]">
+        <div className="flex items-center gap-2 p-3 bg-[#000000] border-t border-[#1f1638]">
           <button
             onClick={toggleMic}
             className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border transition ${
               isListening
-                ? "border-[#FF003C] bg-[#FF003C]/20 text-[#FF003C] animate-pulse"
-                : "border-[#2e2055] bg-[#16112c] text-slate-300 hover:border-[#00D2FF] hover:text-[#00D2FF]"
+                ? "border-[#6366f1] bg-[#6366f1]/20 text-[#00ffcc] animate-pulse shadow-[0_0_15px_rgba(99,102,241,0.5)]"
+                : "border-[#1f1638] bg-[#0a071b] text-slate-300 hover:border-[#6366f1] hover:text-[#00ffcc]"
             }`}
             title={isListening ? "Listening… (Tap to Stop)" : "Tap to Speak Voice Command"}
           >
@@ -265,13 +266,13 @@ export default function StudioVoiceAssistantOverlay() {
               if (e.key === "Enter") handleSend();
             }}
             placeholder={`Instruct OmniAI in ${activeStudioContext}… (e.g. 'erase background', 'snap clips to 0.5s')`}
-            className="flex-1 rounded-xl border border-[#2e2055] bg-[#120d24] px-3.5 py-2 font-mono text-xs text-white placeholder-slate-500 focus:border-[#00D2FF] focus:outline-none"
+            className="flex-1 rounded-xl border border-[#1f1638] bg-[#0a071b] px-3.5 py-2 font-mono text-xs text-white placeholder-slate-500 focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] focus:outline-none"
           />
 
           <button
             onClick={() => handleSend()}
             disabled={!inputText.trim()}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#00D2FF] bg-[#00D2FF] text-black font-bold transition hover:opacity-90 disabled:opacity-30 disabled:border-[#2e2055] disabled:bg-[#16112c] disabled:text-slate-500"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#6366f1] bg-[#6366f1] text-white font-bold transition hover:bg-[#7579f3] shadow-[0_0_15px_rgba(99,102,241,0.35)] disabled:opacity-30 disabled:border-[#1f1638] disabled:bg-[#0a071b] disabled:text-slate-500"
             title="Dispatch Command"
           >
             <Send className="h-4 w-4" />

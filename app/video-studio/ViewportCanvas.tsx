@@ -326,12 +326,12 @@ export default function ViewportCanvas({
 
       ctx.restore(); // Restore video texture transform
 
-      // 4. Safe Zone Margins (Title Safe / Action Safe)
+      // 4. Safe Zone Margins (Hazard safe-zone outline in Vibrant Neon Green #00ffcc)
       if (showSafeZones) {
         ctx.save();
-        ctx.strokeStyle = "rgba(0, 255, 163, 0.15)";
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 4]);
+        ctx.strokeStyle = "rgba(0, 255, 204, 0.75)";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([5, 4]);
 
         const safeW = targetW * 0.9;
         const safeH = targetH * 0.9;
@@ -339,8 +339,13 @@ export default function ViewportCanvas({
 
         const titleW = targetW * 0.8;
         const titleH = targetH * 0.8;
-        ctx.strokeStyle = "rgba(168, 85, 247, 0.18)";
+        ctx.strokeStyle = "rgba(0, 255, 204, 0.45)";
         ctx.strokeRect(stageCenterX - titleW / 2, stageCenterY - titleH / 2, titleW, titleH);
+
+        ctx.fillStyle = "#00ffcc";
+        ctx.font = "bold 9px monospace";
+        ctx.fillText("ACTION_SAFE [90%]", stageCenterX - safeW / 2 + 6, stageCenterY - safeH / 2 + 12);
+        ctx.fillText("TITLE_SAFE [80%]", stageCenterX - titleW / 2 + 6, stageCenterY - titleH / 2 + 12);
         ctx.restore();
       }
 
@@ -432,25 +437,25 @@ export default function ViewportCanvas({
   return (
     <div
       ref={containerRef}
-      className="relative flex h-full w-full flex-col overflow-hidden rounded-xl border border-[#2e2055] bg-[#000000]"
+      className="relative flex h-full w-full flex-col overflow-hidden rounded-xl border border-[#1f1638] bg-[#000000]"
     >
       {/* Top Viewport Toolbar */}
       <div className="absolute top-2.5 left-3 right-3 z-20 flex items-center justify-between pointer-events-none">
         {/* Left Telemetry Badges */}
         <div className="pointer-events-auto flex items-center gap-2">
-          <div className="flex items-center gap-1.5 rounded-lg border border-[#2e2055] bg-[#120d24]/85 px-2.5 py-1 backdrop-blur-md font-mono text-[10px]">
-            <span className="h-2 w-2 rounded-full bg-[#00ffa3] animate-pulse" />
-            <span className="font-bold text-[#00ffa3]">WEBGL LIVE MONITOR</span>
+          <div className="flex items-center gap-1.5 rounded-lg border border-[#1f1638] bg-[#0a071b]/95 px-2.5 py-1 backdrop-blur-md font-mono text-[10px]">
+            <span className="h-2 w-2 rounded-full bg-[#00ffcc] shadow-[0_0_8px_#00ffcc] animate-pulse" />
+            <span className="font-bold text-[#00ffcc]">WEBGL LIVE MONITOR</span>
             <span className="text-slate-400">· 60 FPS</span>
           </div>
 
-          <span className="rounded-lg border border-[#2e2055] bg-[#120d24]/85 px-2 py-1 font-mono text-[10px] text-slate-300 backdrop-blur-md">
+          <span className="rounded-lg border border-[#1f1638] bg-[#0a071b]/95 px-2 py-1 font-mono text-[10px] text-[#00ffcc] backdrop-blur-md">
             {formatTimecode(currentTime)}
           </span>
         </div>
 
         {/* Center Aspect Ratio & Shader Selector */}
-        <div className="pointer-events-auto flex items-center gap-1.5 rounded-lg border border-[#2e2055] bg-[#120d24]/90 p-1 backdrop-blur-md">
+        <div className="pointer-events-auto flex items-center gap-1.5 rounded-lg border border-[#1f1638] bg-[#0a071b]/95 p-1 backdrop-blur-md">
           {/* Aspect Ratios */}
           {(["16:9", "9:16", "1:1", "21:9"] as const).map((ratio) => (
             <button
@@ -458,7 +463,7 @@ export default function ViewportCanvas({
               onClick={() => onAspectRatioChange(ratio)}
               className={`rounded px-2 py-0.5 font-mono text-[10px] font-semibold transition ${
                 aspectRatio === ratio
-                  ? "bg-[#00ffa3] text-black shadow-[0_0_10px_#00ffa3]"
+                  ? "bg-[#6366f1] text-white shadow-[0_0_12px_rgba(99,102,241,0.4)]"
                   : "text-slate-400 hover:text-white"
               }`}
             >
@@ -466,13 +471,13 @@ export default function ViewportCanvas({
             </button>
           ))}
 
-          <div className="h-3 w-px bg-[#2e2055] mx-1" />
+          <div className="h-3 w-px bg-[#1f1638] mx-1" />
 
           {/* Shader Transition Dropdown */}
           <select
             value={shaderEffect}
             onChange={(e) => onShaderChange(e.target.value as ShaderEffect)}
-            className="rounded border border-[#2e2055] bg-[#181130] px-2 py-0.5 font-mono text-[10px] text-[#00ffa3] outline-none"
+            className="rounded border border-[#1f1638] bg-[#000000] px-2 py-0.5 font-mono text-[10px] text-[#00ffcc] outline-none focus:border-[#6366f1]"
           >
             <option value="none">Shader: Standard Pass</option>
             <option value="glitch">Shader: Glitch Drift</option>
@@ -489,8 +494,8 @@ export default function ViewportCanvas({
             title="Toggle Safe Zone Guides"
             className={`rounded-lg border p-1.5 transition backdrop-blur-md ${
               showSafeZones
-                ? "border-[#00ffa3]/40 bg-[#00ffa3]/15 text-[#00ffa3]"
-                : "border-[#2e2055] bg-[#120d24]/80 text-slate-400 hover:text-white"
+                ? "border-[#00ffcc] bg-[#00ffcc]/15 text-[#00ffcc] shadow-[0_0_10px_rgba(0,255,204,0.3)]"
+                : "border-[#1f1638] bg-[#0a071b]/90 text-slate-400 hover:text-white"
             }`}
           >
             <Grid className="h-3.5 w-3.5" />
@@ -499,7 +504,7 @@ export default function ViewportCanvas({
           <button
             onClick={handleResetTransform}
             title="Reset Anchor Transform"
-            className="rounded-lg border border-[#2e2055] bg-[#120d24]/80 p-1.5 text-slate-400 hover:text-[#00ffa3] transition backdrop-blur-md"
+            className="rounded-lg border border-[#1f1638] bg-[#0a071b]/90 p-1.5 text-slate-400 hover:text-[#00ffcc] transition backdrop-blur-md"
           >
             <RotateCw className="h-3.5 w-3.5" />
           </button>
@@ -513,28 +518,28 @@ export default function ViewportCanvas({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        className="h-full w-full cursor-crosshair select-none"
+        className="h-full w-full cursor-crosshair select-none bg-[#000000]"
       />
 
       {/* Bottom Floating Monitor Controls */}
       <div className="absolute bottom-2.5 left-3 right-3 z-20 flex items-center justify-between pointer-events-none">
-        <div className="pointer-events-auto flex items-center gap-2 rounded-lg border border-[#2e2055] bg-[#120d24]/90 px-3 py-1.5 backdrop-blur-md">
+        <div className="pointer-events-auto flex items-center gap-2 rounded-lg border border-[#1f1638] bg-[#0a071b]/95 px-3 py-1.5 backdrop-blur-md">
           <button
             onClick={onTogglePlay}
-            className="flex items-center gap-1.5 text-xs font-bold text-[#00ffa3] hover:text-white transition"
+            className="flex items-center gap-1.5 text-xs font-bold text-[#00ffcc] hover:text-white transition"
           >
             {isPlaying ? <Pause className="h-3.5 w-3.5 fill-current" /> : <Play className="h-3.5 w-3.5 fill-current" />}
             <span className="font-mono">{isPlaying ? "PAUSE" : "PLAY"}</span>
           </button>
 
-          <div className="h-3 w-px bg-[#2e2055]" />
+          <div className="h-3 w-px bg-[#1f1638]" />
 
           <span className="font-mono text-[10px] text-slate-400">
             TRANSFORM: X:{Math.round(transform.x)} Y:{Math.round(transform.y)} · {Math.round(transform.scale * 100)}% · {transform.rotation}°
           </span>
         </div>
 
-        <div className="pointer-events-auto rounded-lg border border-[#2e2055] bg-[#120d24]/90 px-2.5 py-1 font-mono text-[10px] text-slate-400 backdrop-blur-md">
+        <div className="pointer-events-auto rounded-lg border border-[#1f1638] bg-[#0a071b]/95 px-2.5 py-1 font-mono text-[10px] text-[#00ffcc] backdrop-blur-md">
           <span>PIXI/WEBGL RENDERER · ZERO CLOUD COST</span>
         </div>
       </div>

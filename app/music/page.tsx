@@ -38,7 +38,7 @@ import CircularAudioVisualizer from "./CircularAudioVisualizer";
 import TimelineMixer from "./TimelineMixer";
 import VisualBpmCounter from "./VisualBpmCounter";
 import { dawSynthEngine, type StemTrackState } from "@/lib/dawSynthEngine";
-import { mediaVault, type VaultAsset } from "@/lib/mediaVault";
+import { mediaVault, audioStemBridge, type VaultAsset } from "@/lib/mediaVault";
 
 // Preset sonic styles aligned with Dark Misfit Studios
 const SONIC_STYLES = [
@@ -186,6 +186,7 @@ Lost in the feedback of your dark desire`
   const [isExportingWav, setIsExportingWav] = useState<boolean>(false);
   const [wavProgress, setWavProgress] = useState<number>(0);
   const [wavPhase, setWavPhase] = useState<string>("");
+  const [isExportingStemToVideo, setIsExportingStemToVideo] = useState<boolean>(false);
   const [notice, setNotice] = useState<string>("");
 
   // Sonic Texture Controls
@@ -585,6 +586,26 @@ Watch the last illusion dissolve away`
     triggerNotice("Routing synchronized master audio to Storyboard Video Timeline…");
     setTimeout(() => {
       router.push("/storyboard");
+    }, 800);
+  };
+
+  // Unified State Mechanism: Export Audio Tracks from Music Studio directly into Video Studio
+  const handleExportStemToVideoStudio = () => {
+    setIsExportingStemToVideo(true);
+    triggerNotice("Packaging multi-track audio stems and syncing directly to Video Studio Timeline…");
+
+    const exported = audioStemBridge.exportStemToVideoStudio({
+      title: `${bpm}BPM ${keySignature} Studio Master Stem`,
+      bpm,
+      keySignature,
+      duration: 60,
+      tracks: tracks.map((t) => ({ id: t.id, name: t.name, type: t.type, volume: t.volume })),
+    });
+
+    setTimeout(() => {
+      setIsExportingStemToVideo(false);
+      triggerNotice(`Exported "${exported.name}"! Navigating to Video Studio…`);
+      router.push("/video-studio");
     }, 800);
   };
 
@@ -1231,13 +1252,31 @@ Watch the last illusion dissolve away`
               </div>
             )}
 
+            {/* Unified Audio Stem Export: Push Direct to Video Studio Timeline */}
+            <button
+              type="button"
+              onClick={handleExportStemToVideoStudio}
+              disabled={isExportingStemToVideo}
+              className="w-full flex items-center justify-between rounded-xl border border-[#0C00CA] bg-[#0C00CA] px-3.5 py-2.5 text-xs font-bold text-white shadow-[0_0_20px_rgba(12,0,202,0.45)] hover:bg-[#1d08e0] transition active:scale-[0.99] disabled:opacity-50"
+            >
+              <span className="flex items-center gap-2 font-mono">
+                <FolderDown className="h-4 w-4 text-[#00ffff]" />
+                <span className="text-white">
+                  {isExportingStemToVideo ? "Syncing Stems to Video..." : "Export Stems to Video Studio"}
+                </span>
+              </span>
+              <span className="rounded bg-[#000000] px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#00ffff] border border-[#00ffff]/40">
+                TIMELINE SYNC
+              </span>
+            </button>
+
             {/* Pipeline Dispatch 1: Push Direct to Omni Voice Studio */}
             <button
               onClick={handlePushToVoiceStudio}
-              className="w-full flex items-center justify-between rounded-xl border border-[#2e2055] bg-[#16112c] px-3 py-2 text-xs font-semibold text-slate-200 hover:border-[#00ffa3]/50 hover:text-[#00ffa3] transition"
+              className="w-full flex items-center justify-between rounded-xl border border-[#1f1638] bg-[#0a071b] px-3 py-2 text-xs font-semibold text-slate-200 hover:border-[#0C00CA] hover:text-[#00ffff] hover:shadow-[0_0_15px_rgba(12,0,202,0.35)] transition"
             >
               <span className="flex items-center gap-2">
-                <Mic className="h-3.5 w-3.5 text-[#00ffa3]" />
+                <Mic className="h-3.5 w-3.5 text-[#00ffff]" />
                 <span>Push to Omni Voice Studio</span>
               </span>
               <ChevronRight className="h-4 w-4 text-slate-500" />
@@ -1246,10 +1285,10 @@ Watch the last illusion dissolve away`
             {/* Pipeline Dispatch 2: Push Direct to Storyboard Video Timeline */}
             <button
               onClick={handlePushToStoryboard}
-              className="w-full flex items-center justify-between rounded-xl border border-[#2e2055] bg-[#16112c] px-3 py-2 text-xs font-semibold text-slate-200 hover:border-[#00ffa3]/50 hover:text-[#00ffa3] transition"
+              className="w-full flex items-center justify-between rounded-xl border border-[#1f1638] bg-[#0a071b] px-3 py-2 text-xs font-semibold text-slate-200 hover:border-[#0C00CA] hover:text-[#00ffff] hover:shadow-[0_0_15px_rgba(12,0,202,0.35)] transition"
             >
               <span className="flex items-center gap-2">
-                <Layers className="h-3.5 w-3.5 text-[#a855f7]" />
+                <Layers className="h-3.5 w-3.5 text-[#3d2cf5]" />
                 <span>Push to Storyboard Video Timeline</span>
               </span>
               <ChevronRight className="h-4 w-4 text-slate-500" />

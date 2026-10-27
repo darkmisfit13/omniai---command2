@@ -1,5 +1,7 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
+
 export type VaultType = "image" | "audio" | "video" | "musicvideo" | "beat" | "project";
 export interface VaultMeta {
   prompt?: string;
@@ -7,12 +9,16 @@ export interface VaultMeta {
   bpm?: number;
   sampleRate?: number;
   seed?: number;
-  duration?: string;
+  duration?: string | number;
   motion?: string;
   model?: string;
   source?: string;
+  isStemExport?: boolean;
+  stemsCount?: number;
+  keySignature?: string;
   [key: string]: unknown;
 }
+
 export interface VaultAsset {
   id: string;
   type: VaultType;
@@ -24,11 +30,11 @@ export interface VaultAsset {
 
 const TYPE_COLOR: Record<VaultType, string> = {
   image: "#a69eff",
-  audio: "#e879f9",
-  video: "#00f2fe",
-  musicvideo: "#6c63ff",
-  beat: "#6ee7b7",
-  project: "#fcd34d",
+  audio: "#00ffff", // Baby Blue for audio stems & tracks
+  video: "#00ffff",
+  musicvideo: "#0C00CA",
+  beat: "#00ffff",
+  project: "#3d2cf5",
 };
 export const vaultColor = (t: VaultType) => TYPE_COLOR[t];
 
@@ -42,7 +48,7 @@ export const mediaVault = {
   list: () => assets,
   push: (asset: Omit<VaultAsset, "id" | "createdAt"> & { id?: string; createdAt?: number }) => {
     const a: VaultAsset = {
-      id: asset.id ?? crypto.randomUUID(),
+      id: asset.id ?? (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `vault-${Date.now()}`),
       createdAt: asset.createdAt ?? Date.now(),
       type: asset.type,
       name: asset.name,
@@ -57,13 +63,125 @@ export const mediaVault = {
   clear: () => { assets = []; emit(); },
 };
 
-import { useSyncExternalStore } from "react";
+/**
+ * Unified Audio Stem Bridge Mechanism:
+ * Bridges Music Studio exports directly with Video Studio Timeline as multi-track audio stems.
+ */
+export interface ExportedAudioStemPayload {
+  id: string;
+  title: string;
+  bpm: number;
+  keySignature?: string;
+  duration: number; // in seconds
+  url?: string;
+  tracks?: Array<{ id: string; name: string; type: string; volume?: number }>;
+  timestamp: number;
+}
+
+export const audioStemBridge = {
+  /**
+   * Export audio tracks or stems from Music Studio into the unified state repository
+   */
+  exportStemToVideoStudio: (payload: {
+    title: string;
+    bpm: number;
+    keySignature?: string;
+    duration?: number;
+    url?: string;
+    tracks?: Array<{ id: string; name: string; type: string; volume?: number }>;
+  }): VaultAsset => {
+    const assetId = `stem-${Date.now()}`;
+    const cleanDuration = payload.duration && payload.duration > 0 ? payload.duration : 60;
+    
+    // 1. Push to mediaVault
+    const asset = mediaVault.push({
+      id: assetId,
+      type: "audio",
+      name: payload.title,
+      url: payload.url || "/stems/master_stem.wav",
+      meta: {
+        source: "Music Studio Stem Export",
+        bpm: payload.bpm,
+        keySignature: payload.keySignature,
+        duration: cleanDuration,
+        isStemExport: true,
+        stemsCount: payload.tracks?.length || 4,
+      },
+    });
+
+    // 2. Broadcast via window event & persist to localStorage for cross-route sync
+    if (typeof window !== "undefined") {
+      const bridgeData: ExportedAudioStemPayload = {
+        id: asset.id,
+        title: payload.title,
+        bpm: payload.bpm,
+        keySignature: payload.keySignature,
+        duration: cleanDuration,
+        url: payload.url || "/stems/master_stem.wav",
+        tracks: payload.tracks,
+        timestamp: Date.now(),
+      };
+      
+      try {
+        localStorage.setItem("omniai_video_imported_stem", JSON.stringify(bridgeData));
+        // Also keep a history list of exported stems
+        const existingRaw = localStorage.getItem("omniai_stems_vault_history");
+        const list = existingRaw ? JSON.parse(existingRaw) : [];
+        localStorage.setItem("omniai_stems_vault_history", JSON.stringify([bridgeData, ...list].slice(0, 15)));
+      } catch (e) {
+        console.warn("Storage sync fallback:", e);
+      }
+
+      window.dispatchEvent(new CustomEvent("omniai_audio_stem_exported", { detail: bridgeData }));
+    }
+
+    return asset;
+  },
+
+  /**
+   * Check for any freshly exported audio stem to import into Video Studio
+   */
+  getPendingImportedStem: (): ExportedAudioStemPayload | null => {
+    if (typeof window === "undefined") return null;
+    try {
+      const raw = localStorage.getItem("omniai_video_imported_stem");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  },
+
+  /**
+   * Retrieve all exported stems
+   */
+  getExportedStemsHistory: (): ExportedAudioStemPayload[] => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = localStorage.getItem("omniai_stems_vault_history");
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  },
+
+  /**
+   * Clear the active pending import flag after mounting to Timeline
+   */
+  consumePendingStem: () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("omniai_video_imported_stem");
+    }
+  },
+};
+
 export function useMediaVault() {
   return useSyncExternalStore(mediaVault.subscribe, mediaVault.list, () => []);
 }
+
 export function useMediaVaultType(type: VaultType) {
   return useMediaVault().filter(a => a.type === type);
 }
+
 // seed defaults lazily
 export function seedVault() {
   if (assets.length > 0) return;
@@ -77,4 +195,5 @@ export function seedVault() {
   ];
   for (const a of seed) mediaVault.push(a);
 }
+
 export { TYPE_COLOR };

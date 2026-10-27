@@ -7,33 +7,39 @@
 
 :root {
   color-scheme: dark;
-  --hud-bg: #0b0a14;
-  --hud-panel: #14121f;
-  --hud-border: #211d34;
-  --hud-ink: #e8e6f2;
-  --hud-muted: #9490ac;
-  --hud-accent: #6c63ff;
-  --hud-bright: #8b7fff;
-  --hud-stream-from: #00f2fe;
-  --hud-stream-to: #4facfe;
-  --hud-ok: #00ffa3;
+  --hud-bg: #000000;
+  --hud-panel: #0a071b;
+  --hud-border: #1f1638;
+  --hud-ink: #f1f0f7;
+  --hud-muted: #8d87a8;
+  --hud-accent: #0C00CA;
+  --hud-bright: #3d2cf5;
+  --hud-stream-from: #0C00CA;
+  --hud-stream-to: #00ffff;
+  --hud-ok: #00ffff;
   --hud-warn: #ff2a6d;
-  --syn-bg: var(--hud-bg);
-  --syn-panel: var(--hud-panel);
-  --syn-panel-hover: #1b182b;
-  --syn-border: var(--hud-border);
-  --syn-text: var(--hud-ink);
-  --syn-muted: var(--hud-muted);
-  --syn-accent: var(--hud-accent);
-  --syn-accent-bright: var(--hud-bright);
-  /* OmniAI brand aliases — the live-surface layer below reads these so the
-     whole workspace breathes in the system's own signal colours. */
-  --dms-scar: var(--hud-accent);
-  --dms-scar-bright: var(--hud-bright);
-  --dms-scar-pale: #c5bfff;
-  --dms-vein: #6c63ff;
-  --dms-rim: var(--hud-stream-from);
+  --hud-neon: #00ffff;
+  --hud-baby-blue: #00ffff;
+  --syn-bg: #000000;
+  --syn-panel: #0a071b;
+  --syn-panel-hover: #110b29;
+  --syn-border: #1f1638;
+  --syn-text: #f1f0f7;
+  --syn-muted: #8d87a8;
+  --syn-accent: #0C00CA;
+  --syn-accent-bright: #3d2cf5;
+  --syn-neon: #00ffff;
+  /* Absolute Black Cyberpunk brand aliases */
+  --dms-scar: #0C00CA;
+  --dms-scar-bright: #3d2cf5;
+  --dms-scar-pale: #7c6eff;
+  --dms-vein: #0C00CA;
+  --dms-rim: #0C00CA;
   --dms-ember: #ff8a4c;
+  --dms-neon: #00ffff;
+  --dms-canvas: #000000;
+  --dms-panel: #0a071b;
+  --dms-border: #1f1638;
 }
 
 * {
@@ -45,19 +51,20 @@ body {
   height: 100%;
   min-height: 100%;
   overflow: hidden;
-  background: var(--syn-bg);
+  background: #000000 !important;
   color: var(--syn-text);
   font-family: "Inter", sans-serif;
 }
 
 body {
   margin: 0;
+  background: #000000 !important;
   background-image:
     radial-gradient(
       ellipse at 12% 0%,
-      rgba(108, 99, 255, 0.10),
-      transparent 38%
-    );
+      rgba(99, 102, 241, 0.08),
+      transparent 45%
+    ) !important;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
 }
@@ -103,14 +110,14 @@ h4 {
 }
 
 ::selection {
-  background: var(--syn-accent);
+  background: #6366f1;
   color: #ffffff;
 }
 
 /* Scrollbars */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #393252 transparent;
+  scrollbar-color: #1f1638 transparent;
 }
 
 *::-webkit-scrollbar {
@@ -119,7 +126,7 @@ h4 {
 }
 
 *::-webkit-scrollbar-thumb {
-  background: #393252;
+  background: #1f1638;
   border-radius: 20px;
 }
 
@@ -139,9 +146,9 @@ input,
 textarea,
 select {
   max-width: 100%;
-  background: var(--syn-panel) !important;
+  background: #0a071b !important;
   color: var(--syn-text) !important;
-  border: 1px solid var(--syn-border) !important;
+  border: 1px solid #1f1638 !important;
   border-radius: 10px;
 }
 
@@ -161,8 +168,45 @@ input:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  border-color: var(--syn-accent) !important;
-  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.14);
+  border-color: #0C00CA !important;
+  box-shadow: 0 0 0 3px rgba(12, 0, 202, 0.3), 0 0 20px rgba(12, 0, 202, 0.45) !important;
+}
+
+/* Range slider progress tracks and thumbs (Kinetic Physics, Material sliders, etc.) */
+input[type="range"] {
+  accent-color: #0C00CA;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  background: #0a071b;
+  border: 1px solid rgba(12, 0, 202, 0.5);
+  border-radius: 9999px;
+  height: 6px;
+}
+
+input[type="range"]::-moz-range-track {
+  background: #0a071b;
+  border: 1px solid rgba(12, 0, 202, 0.5);
+  border-radius: 9999px;
+  height: 6px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background: #0C00CA;
+  border: 2px solid #3d2cf5;
+  border-radius: 50%;
+  height: 16px;
+  width: 16px;
+  margin-top: -5px;
+  box-shadow: 0 0 14px rgba(12, 0, 202, 0.8);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover,
+input[type="range"]:active::-webkit-slider-thumb {
+  transform: scale(1.2);
+  box-shadow: 0 0 22px rgba(12, 0, 202, 0.95);
 }
 
 /* Buttons */
@@ -171,19 +215,31 @@ button {
     background 160ms ease,
     border-color 160ms ease,
     color 160ms ease,
-    transform 160ms ease;
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+button:hover:not(:disabled) {
+  box-shadow: 0 0 20px rgba(12, 0, 202, 0.45);
 }
 
 button:focus-visible,
 a:focus-visible {
-  outline: 2px solid var(--syn-accent-bright);
+  outline: 2px solid #3d2cf5;
   outline-offset: 3px;
+  box-shadow: 0 0 18px rgba(12, 0, 202, 0.5);
 }
 
 .hud-panel {
-  background: var(--hud-panel);
-  border: 1px solid var(--hud-border);
+  background: #0a071b;
+  border: 1px solid #1f1638;
   border-radius: 8px;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.hud-panel:hover {
+  border-color: #0C00CA;
+  box-shadow: 0 0 20px rgba(12, 0, 202, 0.45), inset 0 0 10px rgba(12, 0, 202, 0.15);
 }
 
 .hud-kicker {
@@ -200,17 +256,21 @@ a:focus-visible {
   justify-content: center;
   gap: 0.4rem;
   min-height: 2.4rem;
-  border: 1px solid var(--hud-border);
+  border: 1px solid #1f1638;
   border-radius: 8px;
   background: transparent;
   color: var(--hud-ink);
   padding: 0.45rem 0.9rem;
   font-size: 0.8125rem;
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
 }
 
-.hud-btn:hover:not(:disabled) {
-  border-color: var(--hud-accent);
-  background: rgba(108, 99, 255, 0.12);
+/* Purplish-Blue glowing accent boundary halo on hover / active */
+.hud-btn:hover:not(:disabled),
+.hud-btn:active:not(:disabled) {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.16);
+  box-shadow: 0 0 18px rgba(99, 102, 241, 0.35), inset 0 0 10px rgba(99, 102, 241, 0.10);
 }
 
 .hud-btn:disabled {
@@ -219,14 +279,16 @@ a:focus-visible {
 }
 
 .hud-btn-primary {
-  border-color: rgba(139, 127, 255, 0.45);
-  background: var(--hud-accent);
+  border-color: #818cf8;
+  background: #6366f1;
   color: #fff;
-  box-shadow: 0 0 18px rgba(108, 99, 255, 0.22);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.45);
 }
 
 .hud-btn-primary:hover:not(:disabled) {
-  background: #7b72ff;
+  background: #4f46e5;
+  border-color: #a5b4fc;
+  box-shadow: 0 0 26px rgba(99, 102, 241, 0.65), inset 0 0 12px rgba(255, 255, 255, 0.2);
 }
 
 .hud-grid {
@@ -346,6 +408,8 @@ a:focus-visible {
 
 .omni-thinking-card {
   animation: omni-thinking-glow 2.8s ease-in-out infinite;
+  background: #0a071b !important;
+  border: 1px solid #1f1638 !important;
 }
 
 .omni-thinking-dots {
@@ -359,8 +423,8 @@ a:focus-visible {
   width: 6px;
   height: 6px;
   border-radius: 999px;
-  background: #a69eff;
-  box-shadow: 0 0 10px rgba(139, 127, 255, 0.45);
+  background: #00ffcc;
+  box-shadow: 0 0 10px rgba(0, 255, 204, 0.7);
   animation: omni-dot-bounce 1.1s ease-in-out infinite;
 }
 
@@ -378,8 +442,8 @@ a:focus-visible {
 }
 
 @keyframes omni-thinking-glow {
-  0%, 100% { border-color: #393252; }
-  50% { border-color: rgba(139, 127, 255, 0.42); }
+  0%, 100% { border-color: #1f1638; }
+  50% { border-color: #6366f1; box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -395,69 +459,65 @@ a:focus-visible {
 
 /* =========================================
    SYNAPTEX — VISUAL REFINEMENT PASS
-   Safe additive styles; preserves existing UI
    ========================================= */
 
 :root {
-  --syn-violet-soft: rgba(139, 127, 255, 0.12);
-  --syn-violet-medium: rgba(139, 127, 255, 0.24);
-  --syn-violet-line: rgba(139, 127, 255, 0.32);
-  --syn-surface-glass: rgba(20, 18, 31, 0.78);
+  --syn-violet-soft: rgba(99, 102, 241, 0.14);
+  --syn-violet-medium: rgba(99, 102, 241, 0.28);
+  --syn-violet-line: #6366f1;
+  --syn-surface-glass: rgba(10, 7, 27, 0.95);
 }
 
-/* Richer ambient lighting across the workspace */
+/* Deep Obsidian ambient lighting */
 body {
+  background: #000000 !important;
   background-image:
     radial-gradient(
       ellipse at 10% 0%,
-      rgba(108, 99, 255, 0.12),
+      rgba(99, 102, 241, 0.08),
       transparent 38%
     ),
     radial-gradient(
       ellipse at 100% 85%,
-      rgba(91, 57, 180, 0.055),
+      rgba(79, 70, 229, 0.05),
       transparent 34%
-    );
+    ) !important;
   background-attachment: fixed;
 }
 
-/* More dimensional AI responses */
+/* Rich Obsidian-Purple AI responses */
 .omni-ai-bubble {
-  background-color: rgba(20, 18, 31, 0.92);
+  background-color: #0a071b !important;
+  border: 1px solid #1f1638 !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.025),
-    0 10px 35px rgba(0, 0, 0, 0.16);
+    0 10px 35px rgba(0, 0, 0, 0.4);
   overflow-wrap: anywhere;
 }
 
 .omni-ai-bubble:hover {
-  border-color: var(--syn-violet-line);
+  border-color: #6366f1 !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.035),
-    0 12px 36px rgba(0, 0, 0, 0.2),
-    0 0 28px rgba(108, 99, 255, 0.055);
+    0 12px 36px rgba(0, 0, 0, 0.4),
+    0 0 24px rgba(99, 102, 241, 0.25) !important;
 }
 
-/* Cleaner, more premium composer surface */
+/* Cleaner Obsidian composer surface */
 .omni-composer {
-  background:
-    linear-gradient(
-      145deg,
-      rgba(28, 24, 46, 0.97),
-      rgba(16, 14, 26, 0.98) 65%
-    );
+  background: #0a071b !important;
+  border: 1px solid #1f1638 !important;
   box-shadow:
-    0 -10px 36px rgba(0, 0, 0, 0.16),
-    0 0 35px rgba(108, 99, 255, 0.035);
+    0 -10px 36px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(99, 102, 241, 0.06);
 }
 
-/* More responsive violet focus treatment */
+/* Purplish-Blue focus treatment */
 .omni-composer input:focus,
 .omni-composer textarea:focus {
-  border-color: var(--syn-violet-line) !important;
+  border-color: #6366f1 !important;
   box-shadow:
-    0 0 0 3px rgba(108, 99, 255, 0.12),
-    0 0 25px rgba(108, 99, 255, 0.075);
+    0 0 0 3px rgba(99, 102, 241, 0.25),
+    0 0 25px rgba(99, 102, 241, 0.35) !important;
 }
 
 /* Polished message and suggestion interactions */
@@ -470,39 +530,19 @@ button:active:not(:disabled) {
 }
 
 .omni-composer button[type="submit"]:not(:disabled) {
+  background: #6366f1;
+  color: #fff;
+  border: 1px solid #818cf8;
   box-shadow:
-    0 0 18px rgba(108, 99, 255, 0.19),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    0 0 18px rgba(99, 102, 241, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .omni-composer button[type="submit"]:hover:not(:disabled) {
+  background: #4f46e5;
   box-shadow:
-    0 0 26px rgba(108, 99, 255, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
-}
-
-/* A quieter, more refined animated thinking surface */
-.omni-thinking-card {
-  background:
-    linear-gradient(
-      115deg,
-      rgba(25, 22, 43, 0.96),
-      rgba(20, 18, 31, 0.96),
-      rgba(29, 23, 49, 0.96)
-    );
-  background-size: 200% 100%;
-  animation:
-    omni-thinking-glow 2.8s ease-in-out infinite,
-    omni-thinking-shimmer 5s ease-in-out infinite;
-}
-
-@keyframes omni-thinking-shimmer {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+    0 0 26px rgba(99, 102, 241, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 /* Subtle, consistent card transitions */
@@ -541,167 +581,12 @@ button:active:not(:disabled) {
 }
 
 /* =========================================
-   SYNAPTEX — VISUAL REFINEMENT PASS
-   ========================================= */
-
-:root {
-  --syn-violet-soft: rgba(139, 127, 255, 0.12);
-  --syn-violet-line: rgba(139, 127, 255, 0.32);
-}
-
-/* Deeper ambient violet lighting */
-body {
-  background-image:
-    radial-gradient(
-      ellipse at 10% 0%,
-      rgba(108, 99, 255, 0.12),
-      transparent 38%
-    ),
-    radial-gradient(
-      ellipse at 100% 85%,
-      rgba(91, 57, 180, 0.055),
-      transparent 34%
-    );
-  background-attachment: fixed;
-}
-
-/* Refined AI response panels */
-.omni-ai-bubble {
-  background-color: rgba(20, 18, 31, 0.94);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.025),
-    0 10px 35px rgba(0, 0, 0, 0.16);
-  overflow-wrap: anywhere;
-  transition:
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    background-color 180ms ease;
-}
-
-.omni-ai-bubble:hover {
-  border-color: var(--syn-violet-line);
-  box-shadow:
-    0 12px 36px rgba(0, 0, 0, 0.2),
-    0 0 28px rgba(108, 99, 255, 0.055);
-}
-
-/* More dimensional composer */
-.omni-composer {
-  background:
-    linear-gradient(
-      145deg,
-      rgba(28, 24, 46, 0.97),
-      rgba(16, 14, 26, 0.98) 65%
-    );
-  box-shadow:
-    0 -10px 36px rgba(0, 0, 0, 0.16),
-    0 0 35px rgba(108, 99, 255, 0.035);
-}
-
-.omni-composer input:focus,
-.omni-composer textarea:focus {
-  border-color: var(--syn-violet-line) !important;
-  box-shadow:
-    0 0 0 3px rgba(108, 99, 255, 0.12),
-    0 0 25px rgba(108, 99, 255, 0.075);
-}
-
-/* More responsive controls */
-button:not(:disabled) {
-  -webkit-tap-highlight-color: transparent;
-}
-
-.omni-composer button[type="submit"]:not(:disabled) {
-  box-shadow:
-    0 0 18px rgba(108, 99, 255, 0.19),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
-}
-
-.omni-composer button[type="submit"]:hover:not(:disabled) {
-  box-shadow:
-    0 0 26px rgba(108, 99, 255, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
-}
-
-/* Animated AI processing indicator */
-.omni-thinking-card {
-  background:
-    linear-gradient(
-      115deg,
-      rgba(25, 22, 43, 0.96),
-      rgba(20, 18, 31, 0.96),
-      rgba(29, 23, 49, 0.96)
-    );
-  background-size: 200% 100%;
-  animation:
-    omni-thinking-glow 2.8s ease-in-out infinite,
-    omni-thinking-shimmer 5s ease-in-out infinite;
-}
-
-@keyframes omni-thinking-shimmer {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
-/* Consistent panel transitions */
-.syn-panel,
-.omni-hero,
-.omni-composer {
-  transition:
-    border-color 180ms ease,
-    box-shadow 180ms ease;
-}
-
-/* Compact screens */
-@media (max-width: 640px) {
-  .omni-composer {
-    padding: 12px;
-  }
-
-  .omni-thinking-card {
-    padding: 14px;
-  }
-
-  .omni-ai-bubble {
-    border-radius: 14px;
-  }
-}
-
-/* Respect accessibility preferences */
-@media (prefers-reduced-motion: reduce) {
-  .omni-thinking-card {
-    animation: none;
-  }
-
-  button,
-  .omni-ai-bubble {
-    transition: none;
-  }
-}
-
-
-/* =========================================
    SYNAPTEX — SCOPED WORKSPACE SHELL POLISH
    ========================================= */
 
 .syn-sidebar {
-  background:
-    radial-gradient(
-      ellipse at 0% 0%,
-      rgba(108, 99, 255, 0.1),
-      transparent 48%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(15, 12, 27, 0.99),
-      rgba(9, 8, 17, 0.995)
-    ) !important;
-  border-right-color: rgba(139, 127, 255, 0.2) !important;
+  background: #0a071b !important;
+  border-right-color: #1f1638 !important;
 }
 
 .syn-sidebar > a:first-child {
@@ -711,24 +596,20 @@ button:not(:disabled) {
 }
 
 .syn-sidebar > a:first-child:hover {
-  background: rgba(139, 127, 255, 0.055);
+  background: rgba(99, 102, 241, 0.08);
 }
 
 .syn-sidebar > button {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(
-    110deg,
-    rgba(108, 99, 255, 0.19),
-    rgba(108, 99, 255, 0.08)
-  ) !important;
-  border-color: rgba(139, 127, 255, 0.32) !important;
+  background: #120d2b !important;
+  border-color: #1f1638 !important;
 }
 
 .syn-sidebar > button:hover:not(:disabled) {
-  border-color: rgba(166, 158, 255, 0.58) !important;
-  background: rgba(108, 99, 255, 0.22) !important;
-  box-shadow: 0 0 24px rgba(108, 99, 255, 0.11);
+  border-color: #6366f1 !important;
+  background: #181138 !important;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
 }
 
 .syn-sidebar nav a {
@@ -737,41 +618,41 @@ button:not(:disabled) {
     background 180ms ease,
     border-color 180ms ease,
     color 180ms ease,
-    transform 180ms ease;
+    transform 180ms ease,
+    box-shadow 180ms ease;
 }
 
 .syn-sidebar nav a[aria-current="page"] {
-  background: linear-gradient(
-    100deg,
-    rgba(108, 99, 255, 0.17),
-    rgba(108, 99, 255, 0.055)
-  ) !important;
-  border-color: rgba(139, 127, 255, 0.24) !important;
+  background: #140e33 !important;
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.3) !important;
 }
 
 .syn-sidebar nav a:hover:not([aria-current="page"]) {
   transform: translateX(2px);
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.25) !important;
 }
 
 .syn-workspace-header {
   position: relative;
-  background: rgba(11, 10, 20, 0.88) !important;
-  border-bottom-color: rgba(139, 127, 255, 0.14) !important;
+  background: rgba(10, 7, 27, 0.92) !important;
+  border-bottom-color: #1f1638 !important;
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
 
 .syn-workspace-header > div:last-child {
   padding: 7px 11px;
-  border: 1px solid rgba(139, 127, 255, 0.13);
+  border: 1px solid #1f1638;
   border-radius: 999px;
-  background: rgba(108, 99, 255, 0.045);
+  background: #0a071b;
 }
 
 .syn-sidebar a:focus-visible,
 .syn-sidebar button:focus-visible,
 .syn-workspace-header button:focus-visible {
-  outline: 2px solid #a69eff;
+  outline: 2px solid #818cf8;
   outline-offset: 3px;
 }
 
@@ -2392,9 +2273,9 @@ body {
   flex-direction: column;
   gap: 0.65rem;
   padding: 0.85rem;
-  background: linear-gradient(180deg, #0f0d19, #0b0a14);
-  border-right: 1px solid #241f3a;
-  box-shadow: 24px 0 64px rgba(0, 0, 0, 0.6);
+  background: #0a071b;
+  border-right: 1px solid #1f1638;
+  box-shadow: 24px 0 64px rgba(0, 0, 0, 0.8);
   transform: translateX(-104%);
   transition: transform 300ms cubic-bezier(0.2, 0.7, 0.3, 1);
 }
@@ -2433,8 +2314,8 @@ body {
     width: 308px;
     min-width: 308px;
     padding: 0.85rem;
-    border-right-color: #241f3a;
-    background: linear-gradient(180deg, #0f0d19, #0b0a14);
+    border-right-color: #1f1638;
+    background: #0a071b;
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
@@ -2449,12 +2330,22 @@ body {
 
 .chat-side__new {
   flex: 1;
+  background: #6366f1 !important;
+  border-color: #818cf8 !important;
+  color: #fff !important;
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.35) !important;
+}
+
+.chat-side__new:hover:not(:disabled) {
+  background: #4f46e5 !important;
+  box-shadow: 0 0 22px rgba(99, 102, 241, 0.55) !important;
 }
 
 .chat-side__close {
   width: 2.35rem;
   padding: 0;
   font-size: 1.05rem;
+  border-color: #1f1638;
 }
 
 @media (min-width: 1024px) {
@@ -2467,9 +2358,9 @@ body {
   display: flex;
   gap: 0.3rem;
   padding: 0.22rem;
-  border: 1px solid #241f3a;
+  border: 1px solid #1f1638;
   border-radius: 10px;
-  background: #0d0b17;
+  background: #000000;
 }
 
 .chat-side__tab {
@@ -2479,7 +2370,7 @@ body {
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: #8e89a8;
+  color: #8d87a8;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -2492,19 +2383,17 @@ body {
 }
 
 .chat-side__tab.is-active {
-  background: linear-gradient(180deg, #241d40, #191433);
-  color: #e0dbff;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 2px 0 -1px #0a0813,
-    0 6px 14px rgba(0, 0, 0, 0.45);
+  background: #140e33;
+  color: #f1f0f7;
+  border: 1px solid #6366f1;
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.35);
 }
 
 .chat-side__count {
   margin-left: 0.35rem;
   padding: 0 0.32rem;
   border-radius: 999px;
-  background: var(--hud-accent);
+  background: #6366f1;
   color: #fff;
   font-size: 0.6rem;
   line-height: 1.35;

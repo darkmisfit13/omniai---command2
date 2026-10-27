@@ -542,10 +542,10 @@ export default function OmniBeatStudioNexus() {
         ctx.fillRect(0, 0, width, height);
       }
 
-      // 6. [Show App Safe Zones] RED BOUNDARY HAZARD OVERLAY
+      // 6. [Show App Safe Zones] HIGH-CONTRAST VIBRANT NEON GREEN HAZARD OVERLAY (#00ffcc)
       if (showSafeZones) {
         ctx.save();
-        ctx.strokeStyle = "#ff2a6d";
+        ctx.strokeStyle = "#00ffcc";
         ctx.lineWidth = 2;
         ctx.setLineDash([8, 6]);
 
@@ -557,19 +557,19 @@ export default function OmniBeatStudioNexus() {
         const rightW = width * 0.16;
         const rightY = height * 0.28;
         const rightH = height * 0.52;
-        ctx.fillStyle = "rgba(255, 42, 109, 0.12)";
+        ctx.fillStyle = "rgba(0, 255, 204, 0.15)";
         ctx.fillRect(width - rightW, rightY, rightW - 8, rightH);
         ctx.strokeRect(width - rightW, rightY, rightW - 8, rightH);
 
         // Bottom Caption Hazard Box
         const botH = height * 0.18;
-        ctx.fillStyle = "rgba(255, 42, 109, 0.15)";
+        ctx.fillStyle = "rgba(0, 255, 204, 0.18)";
         ctx.fillRect(width * 0.05, height - botH, width * 0.72, botH - 10);
         ctx.strokeRect(width * 0.05, height - botH, width * 0.72, botH - 10);
 
-        // Warning Hazard Labels
+        // Warning Hazard Labels in Vibrant Neon Green
         ctx.font = "bold 10px monospace";
-        ctx.fillStyle = "#ff2a6d";
+        ctx.fillStyle = "#00ffcc";
         ctx.fillText("⚠ HAZARD: APP SAFE ZONE [TIKTOK / REELS / SHORTS]", width * 0.07, topH - 8);
         ctx.fillText("ICONS HAZARD", width - rightW + 4, rightY + 16);
         ctx.fillText("TITLE & CAPTION OVERLAY", width * 0.07, height - botH + 18);
