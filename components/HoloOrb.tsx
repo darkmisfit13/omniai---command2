@@ -1,481 +1,452 @@
 "use client";
 
-import {
-  Component,
-  useEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type ErrorInfo,
-  type MutableRefObject,
-  type ReactNode,
-  type PointerEvent as ReactPointerEvent,
-} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { useDirector, type WorkspaceRequestActivity } from "@/lib/directorMode";
 
-type Props = {
+export type OrbPhase = 
+  | "idle" 
+  | "thinking"
+  | "observing" 
+  | "analyzing" 
+  | "suggesting" 
+  | "typing" 
+  | "auto" 
+  | "talking" 
+  | "texting"
+  | "listening"
+  | "processing"
+  | "directAction";
+
+export type OrbState = OrbPhase | string;
+
+export interface HoloOrbProps {
+  phase?: OrbPhase;
+  status?: OrbPhase; // Alias support for status === 'idle' | 'thinking' | 'talking'
+  state?: OrbPhase | string; // Backward compatibility alias
+  size?: "xs" | "sm" | "md" | "lg" | "hero" | "220" | "chat220" | string;
   className?: string;
-  showLabel?: boolean;
-  style?: CSSProperties;
-};
-
-const SIMPLEX_3D = [
-  "vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }",
-  "vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }",
-  "vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }",
-  "vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }",
-  "float snoise(vec3 v) {",
-  "  const vec2 C = vec2(1.0 / 6.0, 1.0 / 3.0);",
-  "  const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);",
-  "  vec3 i = floor(v + dot(v, C.yyy));",
-  "  vec3 x0 = v - i + dot(i, C.xxx);",
-  "  vec3 g = step(x0.yzx, x0.xyz);",
-  "  vec3 l = 1.0 - g;",
-  "  vec3 i1 = min(g.xyz, l.zxy);",
-  "  vec3 i2 = max(g.xyz, l.zxy);",
-  "  vec3 x1 = x0 - i1 + C.xxx;",
-  "  vec3 x2 = x0 - i2 + C.yyy;",
-  "  vec3 x3 = x0 - D.yyy;",
-  "  i = mod289(i);",
-  "  vec4 p = permute(permute(permute(i.z + vec4(0.0, i1.z, i2.z, 1.0)) + i.y + vec4(0.0, i1.y, i2.y, 1.0)) + i.x + vec4(0.0, i1.x, i2.x, 1.0));",
-  "  float n_ = 0.142857142857;",
-  "  vec3 ns = n_ * D.wyz - D.xzx;",
-  "  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);",
-  "  vec4 x_ = floor(j * ns.z);",
-  "  vec4 y_ = floor(j - 7.0 * x_);",
-  "  vec4 x = x_ * ns.x + ns.yyyy;",
-  "  vec4 y = y_ * ns.x + ns.yyyy;",
-  "  vec4 h = 1.0 - abs(x) - abs(y);",
-  "  vec4 b0 = vec4(x.xy, y.xy);",
-  "  vec4 b1 = vec4(x.zw, y.zw);",
-  "  vec4 s0 = floor(b0) * 2.0 + 1.0;",
-  "  vec4 s1 = floor(b1) * 2.0 + 1.0;",
-  "  vec4 sh = -step(h, vec4(0.0));",
-  "  vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;",
-  "  vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;",
-  "  vec3 p0 = vec3(a0.xy, h.x);",
-  "  vec3 p1 = vec3(a0.zw, h.y);",
-  "  vec3 p2 = vec3(a1.xy, h.z);",
-  "  vec3 p3 = vec3(a1.zw, h.w);",
-  "  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));",
-  "  p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;",
-  "  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);",
-  "  m = m * m;",
-  "  return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));",
-  "}",
-].join("\n");
-
-const CORE_VERTEX = SIMPLEX_3D + "\n" + [
-  "uniform float uTime; uniform float uTurbulence; uniform float uRotationSpeed;",
-  "varying vec3 vLocalPosition; varying vec3 vViewPosition; varying vec3 vNormalView;",
-  "void main() {",
-  "  vLocalPosition = position;",
-  "  float drift = uTime * (0.08 + uRotationSpeed * 0.12);",
-  "  float n1 = snoise(position * 3.2 + vec3(drift, -drift * 0.7, drift * 0.45));",
-  "  float n2 = snoise(position * 7.4 - vec3(drift * 0.35, drift * 0.8, -drift));",
-  "  vec3 displaced = position + normal * (n1 * 0.018 + n2 * 0.006) * (0.4 + uTurbulence);",
-  "  vec4 mvPosition = modelViewMatrix * vec4(displaced, 1.0);",
-  "  vViewPosition = -mvPosition.xyz; vNormalView = normalize(normalMatrix * normal);",
-  "  gl_Position = projectionMatrix * mvPosition;",
-  "}",
-].join("\n");
-
-const CORE_FRAGMENT = SIMPLEX_3D + "\n" + [
-  "uniform float uTime; uniform float uPulseRate; uniform float uEnergy; uniform float uTurbulence;",
-  "uniform vec2 uPointer;",
-  "varying vec3 vLocalPosition; varying vec3 vViewPosition; varying vec3 vNormalView;",
-  "void main() {",
-  "  vec3 viewDir = normalize(vViewPosition); vec3 normalDir = normalize(vNormalView);",
-  "  float fresnel = pow(1.0 - max(dot(normalDir, viewDir), 0.0), 2.2);",
-  "  float n = snoise(vLocalPosition * (3.2 + uTurbulence * 1.4) + vec3(uTime * 0.11, uPointer.x * 0.65, uPointer.y * 0.55));",
-  "  float detail = snoise(vLocalPosition * 9.0 - vec3(uTime * 0.18, uTime * 0.09, 0.0));",
-  "  float pulse = 0.5 + 0.5 * sin(uTime * uPulseRate + n * 2.4);",
-  "  float lightField = smoothstep(-0.45, 0.8, n * 0.72 + detail * 0.26 + pulse * 0.22);",
-  "  vec3 deep = vec3(0.012, 0.035, 0.105); vec3 electric = vec3(0.015, 0.78, 0.98);",
-  "  vec3 violet = vec3(0.28, 0.22, 0.92); vec3 teal = vec3(0.27, 0.91, 0.70);",
-  "  vec3 color = mix(deep, violet, smoothstep(0.05, 0.8, lightField) * 0.48);",
-  "  color = mix(color, electric, smoothstep(0.2, 0.9, lightField) * 0.78);",
-  "  color = mix(color, teal, smoothstep(0.58, 0.96, fresnel + detail * 0.14) * 0.44);",
-  "  float alpha = clamp((0.42 + lightField * 0.42 + fresnel * 0.34) * uEnergy, 0.0, 0.96);",
-  "  gl_FragColor = vec4(color, alpha);",
-  "}",
-].join("\n");
-
-const RIBBON_VERTEX = SIMPLEX_3D + "\n" + [
-  "uniform float uTime; uniform float uTurbulence; uniform float uRotationSpeed;",
-  "varying vec3 vLocalPosition; varying vec3 vViewPosition; varying vec3 vNormalView;",
-  "void main() {",
-  "  vLocalPosition = position;",
-  "  float drift = uTime * (0.1 + uRotationSpeed * 0.18);",
-  "  float n = snoise(position * 2.8 + vec3(drift, -drift * 0.6, drift * 0.38));",
-  "  vec3 displaced = position + normal * n * (0.012 + 0.018 * uTurbulence);",
-  "  vec4 mvPosition = modelViewMatrix * vec4(displaced, 1.0);",
-  "  vViewPosition = -mvPosition.xyz; vNormalView = normalize(normalMatrix * normal);",
-  "  gl_Position = projectionMatrix * mvPosition;",
-  "}",
-].join("\n");
-
-const RIBBON_FRAGMENT = SIMPLEX_3D + "\n" + [
-  "uniform float uTime; uniform float uPulseRate; uniform float uEnergy; uniform float uTurbulence;",
-  "uniform vec2 uPointer;",
-  "varying vec3 vLocalPosition; varying vec3 vViewPosition; varying vec3 vNormalView;",
-  "void main() {",
-  "  vec3 p = normalize(vLocalPosition);",
-  "  float drift = uTime * (0.12 + uPulseRate * 0.025);",
-  "  vec3 warp = vec3(uPointer.x * 0.75, uPointer.y * 0.65, (uPointer.x-uPointer.y) * 0.32);",
-  "  float n1 = snoise(p * (4.4 + uTurbulence * 2.0) + warp + vec3(drift, -drift * 0.7, drift * 0.4));",
-  "  float n2 = snoise(p * 8.3 - warp * 0.65 - vec3(drift * 0.55, 0.0, drift));",
-  "  float longitude = atan(p.z, p.x); float latitude = asin(clamp(p.y, -1.0, 1.0));",
-  "  float fieldA = longitude * 3.2 + latitude * 2.0 + n1 * (1.5 + uTurbulence) + drift;",
-  "  float fieldB = longitude * -4.1 + latitude * 1.4 + n2 * 1.2 - drift * 0.72;",
-  "  float ribbonA = pow(max(0.0, 1.0 - abs(sin(fieldA))), 12.0);",
-  "  float ribbonB = pow(max(0.0, 1.0 - abs(sin(fieldB))), 18.0);",
-  "  float filament = pow(max(0.0, 1.0 - abs(sin(fieldA * 1.9 + n2))), 28.0);",
-  "  vec3 viewDir = normalize(vViewPosition);",
-  "  float rim = pow(1.0 - max(dot(normalize(vNormalView), viewDir), 0.0), 2.8);",
-  "  float pulse = 0.68 + 0.32 * sin(uTime * uPulseRate + n1 * 2.0);",
-  "  vec3 electric = vec3(0.01, 0.79, 1.0); vec3 violet = vec3(0.34, 0.26, 1.0);",
-  "  vec3 teal = vec3(0.31, 0.95, 0.74);",
-  "  vec3 color = electric * (ribbonA * 0.78 + filament * 0.56);",
-  "  color += violet * ribbonB * 0.58 + teal * rim * 0.44;",
-  "  float alpha = clamp((ribbonA*0.38 + ribbonB*0.30 + filament*0.32 + rim*0.16) * pulse * uEnergy, 0.0, 0.92);",
-  "  gl_FragColor = vec4(color, alpha);",
-  "}",
-].join("\n");
-
-const HOST_CSS = [
-  ".holo-orb-host > .holo-orb-webgl, .holo-orb-host > .holo-orb-error-boundary { position:absolute; inset:0; width:100%; height:100%; min-width:0; min-height:0; overflow:hidden; }",
-  ".holo-orb-webgl canvas { display:block; width:100%; height:100%; }",
-].join("\n");
-
-const PHASE_INTENSITY: Record<WorkspaceRequestActivity["phase"], number> = {
-  idle: 0.12,
-  preflight: 0.3,
-  security: 0.34,
-  routing: 0.48,
-  local_execution: 0.68,
-  cloud_execution: 0.92,
-  director_execution: 0.8,
-  saving: 0.54,
-  succeeded: 0.38,
-  failed: 0.26,
-  blocked: 0.16,
-};
-
-function phaseLabel(activity: WorkspaceRequestActivity): string {
-  switch (activity.phase) {
-    case "preflight": return "Request classified";
-    case "security": return "Security check";
-    case "routing": return "Request routed";
-    case "local_execution": return "Streaming locally";
-    case "cloud_execution": return "Streaming in cloud";
-    case "director_execution": return "Streaming Director workflow";
-    case "saving": return "Saving result";
-    case "succeeded": return "Complete";
-    case "failed": return "Request failed";
-    case "blocked": return "Request blocked";
-    default: return "Standing by";
-  }
+  onClick?: () => void;
+  showStatusLabel?: boolean;
+  showLabel?: boolean; // Backward compatibility alias
+  style?: React.CSSProperties;
 }
 
-type BoundaryProps = { children: ReactNode };
-type BoundaryState = { failed: boolean };
-
-class OrbErrorBoundary extends Component<BoundaryProps, BoundaryState> {
-  state: BoundaryState = { failed: false };
-
-  static getDerivedStateFromError(): BoundaryState {
-    return { failed: true };
-  }
-
-  componentDidCatch(_error: Error, _info: ErrorInfo): void {
-    // Keep WebGL faults contained to this visual instrument.
-  }
-
-  render() {
-    return this.state.failed ? <div className="holo-orb-error-boundary" role="status">WebGL renderer unavailable</div> : this.props.children;
-  }
+// Raw 3D Perlin Noise GLSL
+const noiseGLSL = /* glsl */ `
+vec3 hash3(vec3 p) {
+  p = vec3(dot(p, vec3(127.1, 311.7, 74.7)), dot(p, vec3(269.5, 183.3, 246.1)), dot(p, vec3(113.5, 271.9, 124.6)));
+  return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
 }
 
-type OrbCanvasProps = {
-  activity: WorkspaceRequestActivity;
-  pointerRef: MutableRefObject<THREE.Vector2>;
-};
+float noise3(vec3 p) {
+  vec3 i = floor(p), f = fract(p), u = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
+  return mix(
+    mix(
+      mix(dot(hash3(i), f), dot(hash3(i + vec3(1, 0, 0)), f - vec3(1, 0, 0)), u.x),
+      mix(dot(hash3(i + vec3(0, 1, 0)), f - vec3(0, 1, 0)), dot(hash3(i + vec3(1, 1, 0)), f - vec3(1, 1, 0)), u.x),
+      u.y
+    ),
+    mix(
+      mix(dot(hash3(i + vec3(0, 0, 1)), f - vec3(0, 0, 1)), dot(hash3(i + vec3(1, 0, 1)), f - vec3(1, 0, 1)), u.x),
+      mix(dot(hash3(i + vec3(0, 1, 1)), f - vec3(0, 1, 1)), dot(hash3(i + vec3(1, 1, 1)), f - vec3(1, 1, 1)), u.x),
+      u.y
+    ),
+    u.z
+  );
+}
 
-function OrbCanvas({ activity, pointerRef }: OrbCanvasProps) {
-  const mountRef = useRef<HTMLDivElement | null>(null);
-  const activityRef = useRef(activity);
-  const [failed, setFailed] = useState(false);
-  activityRef.current = activity;
+float fbm(vec3 p) {
+  return noise3(p) * 0.57 + noise3(p * 2.03 + 3.1) * 0.28 + noise3(p * 4.07 + 7.4) * 0.15;
+}
+`;
+
+const vertexShader = /* glsl */ `
+uniform float uTime, uTurbulence, uPulse, uHover, uWaveMorph;
+uniform vec2 uPointer;
+varying vec3 vPosition, vNormal, vView;
+${noiseGLSL}
+
+void main() {
+  vec3 n = normalize(position);
+  float flow = fbm(n * 3.6 + vec3(uTime * 0.18, -uTime * 0.22, uTime * 0.11));
+  vec3 pull = vec3(uPointer * 0.85, 0.8);
+  float attraction = exp(-length(n.xy - uPointer * 0.75) * 3.2) * uHover;
+  
+  // Audio wave displacement mapping when talking: dynamically morphs shell with speech harmonics
+  float audioWave = sin(n.y * 14.0 + uTime * 8.5) * cos(n.x * 12.0 + uTime * 6.2) * uWaveMorph * 0.16;
+  float pScale = 1.0 + flow * uTurbulence * 0.32 + sin(uTime * uPulse) * 0.035 + audioWave;
+
+  vec3 p = position * pScale;
+  p += pull * attraction * 0.2;
+  p.xy += vec2(-n.y, n.x) * flow * uHover * 0.14;
+  vPosition = p;
+  vNormal = normalize(normalMatrix * n);
+  vec4 view = modelViewMatrix * vec4(p, 1.0);
+  vView = -view.xyz;
+  gl_Position = projectionMatrix * view;
+}
+`;
+
+const fragmentShader = /* glsl */ `
+uniform float uTime, uTurbulence, uPulse, uHover, uColorShift;
+uniform vec2 uPointer;
+uniform vec3 uBluishWhite, uCyanGlow, uVioletAccent, uSparkleWhite;
+varying vec3 vPosition, vNormal, vView;
+${noiseGLSL}
+
+void main() {
+  vec3 p = normalize(vPosition);
+  vec3 q = p * 3.2 + vec3(uTime * 0.14, -uTime * 0.2, uTime * 0.1);
+  q.xy += uPointer * uHover * 0.35;
+  float n = fbm(q + fbm(q + 2.8) * (1.5 + uTurbulence));
+  float ribbon = pow(1.0 - abs(sin(p.y * 11.0 + p.x * 3.2 + n * 8.5 - uTime * 0.8)), 10.0);
+  float fine = pow(1.0 - abs(sin(p.y * 24.0 - n * 14.0 + uTime * 0.45)), 22.0);
+  float facing = max(dot(normalize(vNormal), normalize(vView)), 0.0);
+  float rim = pow(1.0 - facing, 2.6);
+  float core = pow(facing, 6.8) * (0.45 + 0.15 * sin(uTime * uPulse));
+  float tint = clamp(n * 2.3 + p.x * 0.5 + 0.5, 0.0, 1.0);
+
+  // Dynamic shift: bluish-white core with shifting multi-color accents (cyan, violet, electric blue)
+  vec3 shiftingAccent = mix(uVioletAccent, vec3(0.0, 0.9, 1.0), sin(uTime * 1.5) * 0.5 + 0.5);
+  vec3 targetCore = mix(uBluishWhite, shiftingAccent, uColorShift * 0.4);
+  vec3 targetRim = mix(uCyanGlow, uVioletAccent, uColorShift * 0.7);
+
+  vec3 energy = mix(targetRim, targetCore, tint);
+  energy = mix(energy, uSparkleWhite, smoothstep(0.72, 0.98, p.x + n) * 0.6);
+
+  vec3 col = energy * (0.2 + ribbon * 2.2 + fine * 0.75 + rim * 1.4);
+  col += targetCore * core * 2.0 + mix(targetCore, targetRim, 0.4) * pow(facing, 18.0) * 0.9;
+
+  gl_FragColor = vec4(col, 0.88 + ribbon * 0.12);
+}
+`;
+
+const particleVertex = /* glsl */ `
+uniform float uTime, uPulse, uRingTightness;
+attribute float aSeed;
+varying float vSeed;
+
+void main() {
+  vSeed = aSeed;
+  vec3 p = position;
+  
+  // In thinking mode: compress sparkles into a tight high-velocity spinning sparkle ring
+  float spinSpeed = mix(0.25 + aSeed * 0.35, 4.2 + aSeed * 1.5, uRingTightness);
+  float angle = uTime * spinSpeed;
+  float c = cos(angle), s = sin(angle);
+  p.xz = mat2(c, -s, s, c) * p.xz;
+
+  // Modulate radius: collapses sparkles into orbital equator ring
+  float ringRadius = mix(1.0, 0.72 + sin(aSeed * 6.28) * 0.08, uRingTightness);
+  p.xz *= ringRadius;
+  p.y = mix(p.y, sin(angle * 2.0 + aSeed * 3.14) * 0.18, uRingTightness * 0.85);
+
+  p *= 1.0 + sin(uTime * uPulse + aSeed * 6.28) * 0.06;
+  vec4 view = modelViewMatrix * vec4(p, 1.0);
+  gl_Position = projectionMatrix * view;
+  gl_PointSize = mix(2.0 + aSeed * 2.6, 3.2 + aSeed * 3.0, uRingTightness) * (3.8 / -view.z);
+}
+`;
+
+const particleFragment = /* glsl */ `
+uniform vec3 uCyanGlow, uVioletAccent, uSparkleWhite;
+uniform float uColorShift;
+varying float vSeed;
+
+void main() {
+  float d = length(gl_PointCoord - 0.5);
+  if (d > 0.5) discard;
+  vec3 baseColor = mix(uCyanGlow, uVioletAccent, uColorShift);
+  vec3 c = mix(baseColor, uSparkleWhite, vSeed * 0.75);
+  gl_FragColor = vec4(c, (1.0 - smoothstep(0.04, 0.5, d)) * 0.95);
+}
+`;
+
+export const HoloOrb: React.FC<HoloOrbProps> = ({
+  phase,
+  status,
+  state,
+  size = "md",
+  className = "",
+  onClick,
+  showStatusLabel = false,
+  showLabel,
+  style,
+}) => {
+  const rawPhase = (status || phase || state || "idle") as string;
+  const activePhase = (rawPhase === "speaking" ? "talking" : rawPhase) as OrbPhase;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [hasWebGL, setHasWebGL] = useState(true);
+
+  const sizeStyles: Record<string, string> = {
+    xs: "w-6 h-6",
+    sm: "w-8 h-8",
+    md: "w-11 h-11",
+    lg: "w-20 h-20",
+    hero: "w-60 h-60 sm:w-72 sm:h-72",
+    "220": "w-[220px] h-[220px]",
+    chat220: "w-[220px] h-[220px]",
+  };
+
+  const resolvedSizeClass = className.includes("w-") && className.includes("h-") 
+    ? "" 
+    : (sizeStyles[size] || "w-11 h-11");
 
   useEffect(() => {
-    const mount = mountRef.current;
-    if (!mount || failed) return;
+    const container = containerRef.current;
+    if (!container) return;
 
     let renderer: THREE.WebGLRenderer | null = null;
-    let frameId = 0;
-    let disposed = false;
-    let observer: ResizeObserver | null = null;
-    let coreGeometry: THREE.BufferGeometry | null = null;
-    let ribbonGeometry: THREE.BufferGeometry | null = null;
-    let coreMaterial: THREE.ShaderMaterial | null = null;
-    let ribbonMaterial: THREE.ShaderMaterial | null = null;
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let reducedMotion = media.matches;
-
-    const markFailed = () => {
-      if (!disposed) setFailed(true);
-    };
-    const onMotionChange = (event: MediaQueryListEvent) => { reducedMotion = event.matches; };
+    let animationFrameId: number;
+    let resizeObserver: ResizeObserver | null = null;
 
     try {
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+      camera.position.z = 4.2;
+
       renderer = new THREE.WebGLRenderer({
         alpha: true,
         antialias: true,
         powerPreference: "high-performance",
-        failIfMajorPerformanceCaveat: true,
       });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-      renderer.setClearColor(0x070b18, 0);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      const width = container.clientWidth || 44;
+      const height = container.clientHeight || 44;
+      renderer.setSize(width, height);
       renderer.outputColorSpace = THREE.SRGBColorSpace;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.15;
-      renderer.debug.checkShaderErrors = true;
-      renderer.debug.onShaderError = () => markFailed();
-      renderer.domElement.setAttribute("aria-hidden", "true");
-      renderer.domElement.style.cssText = "display:block;width:100%;height:100%;outline:0;pointer-events:none;";
-      mount.appendChild(renderer.domElement);
+      container.appendChild(renderer.domElement);
 
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 20);
-      camera.position.set(0, 0, 3.35);
-      const rig = new THREE.Group();
-      scene.add(rig);
+      const uBluishWhite = new THREE.Color("#e2f1ff");
+      const uCyanGlow = new THREE.Color("#00e5ff");
+      const uVioletAccent = new THREE.Color("#8b5cf6");
+      const uSparkleWhite = new THREE.Color("#ffffff");
 
-      const makeUniforms = () => ({
+      const uniforms = {
         uTime: { value: 0 },
-        uPulseRate: { value: 0.5 },
-        uEnergy: { value: 0.5 },
-        uTurbulence: { value: 0.25 },
-        uRotationSpeed: { value: 0.1 },
+        uTurbulence: { value: 0.16 },
+        uPulse: { value: 1.0 },
+        uHover: { value: 0 },
         uPointer: { value: new THREE.Vector2(0, 0) },
-      });
-      const coreUniforms = makeUniforms();
-      const ribbonUniforms = makeUniforms();
-
-      coreGeometry = new THREE.IcosahedronGeometry(0.68, 5);
-      coreMaterial = new THREE.ShaderMaterial({
-        uniforms: coreUniforms,
-        vertexShader: CORE_VERTEX,
-        fragmentShader: CORE_FRAGMENT,
-        transparent: true,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-        side: THREE.FrontSide,
-      });
-      rig.add(new THREE.Mesh(coreGeometry, coreMaterial));
-
-      ribbonGeometry = new THREE.SphereGeometry(0.86, 128, 96);
-      ribbonMaterial = new THREE.ShaderMaterial({
-        uniforms: ribbonUniforms,
-        vertexShader: RIBBON_VERTEX,
-        fragmentShader: RIBBON_FRAGMENT,
-        transparent: true,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-        side: THREE.DoubleSide,
-      });
-      rig.add(new THREE.Mesh(ribbonGeometry, ribbonMaterial));
-
-      const resize = () => {
-        if (!renderer || disposed) return;
-        const width = Math.max(1, mount.clientWidth);
-        const height = Math.max(1, mount.clientHeight);
-        renderer.setSize(width, height, false);
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
+        uBluishWhite: { value: uBluishWhite },
+        uCyanGlow: { value: uCyanGlow },
+        uVioletAccent: { value: uVioletAccent },
+        uSparkleWhite: { value: uSparkleWhite },
+        uColorShift: { value: 0.0 },
+        uRingTightness: { value: 0.0 },
+        uWaveMorph: { value: 0.0 },
       };
-      resize();
 
-      if (typeof ResizeObserver !== "undefined") {
-        observer = new ResizeObserver(resize);
-        observer.observe(mount);
-      } else {
-        window.addEventListener("resize", resize);
+      const geometry = new THREE.SphereGeometry(1, 48, 36);
+      const material = new THREE.ShaderMaterial({
+        vertexShader,
+        fragmentShader,
+        uniforms,
+        transparent: true,
+        depthWrite: false,
+      });
+      const orbMesh = new THREE.Mesh(geometry, material);
+
+      const particleCount = 580;
+      const positions = new Float32Array(particleCount * 3);
+      const seeds = new Float32Array(particleCount);
+
+      for (let i = 0; i < particleCount; i++) {
+        const y = 1 - 2 * (i + 0.5) / particleCount;
+        const radius = Math.sqrt(1 - y * y);
+        const angle = i * 2.3999632;
+        const shell = 1.08 + 0.22 * (0.5 + 0.5 * Math.sin(i * 18.31));
+        positions[i * 3] = Math.cos(angle) * radius * shell;
+        positions[i * 3 + 1] = y * shell;
+        positions[i * 3 + 2] = Math.sin(angle) * radius * shell;
+        seeds[i] = (i * 0.6180339) % 1;
       }
 
-      const onContextLost = (event: Event) => {
-        event.preventDefault();
-        markFailed();
+      const particleGeo = new THREE.BufferGeometry();
+      particleGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      particleGeo.setAttribute("aSeed", new THREE.BufferAttribute(seeds, 1));
+
+      const particleMat = new THREE.ShaderMaterial({
+        vertexShader: particleVertex,
+        fragmentShader: particleFragment,
+        uniforms,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      });
+      const particleMesh = new THREE.Points(particleGeo, particleMat);
+
+      const group = new THREE.Group();
+      group.add(orbMesh);
+      group.add(particleMesh);
+      scene.add(group);
+
+      const targetPointer = new THREE.Vector2(0, 0);
+      const currentPointer = new THREE.Vector2(0, 0);
+      let targetHover = 0;
+      let currentHover = 0;
+
+      const handlePointerMove = (e: MouseEvent | TouchEvent) => {
+        const rect = container.getBoundingClientRect();
+        const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+        const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+        targetPointer.x = ((clientX - rect.left) / Math.max(rect.width, 1)) * 2 - 1;
+        targetPointer.y = -(((clientY - rect.top) / Math.max(rect.height, 1)) * 2 - 1);
+        targetHover = 1.7;
       };
-      renderer.domElement.addEventListener("webglcontextlost", onContextLost, false);
-      media.addEventListener("change", onMotionChange);
 
-      let previousTime = 0;
-      let elapsed = 0;
-      const animate = (now: number) => {
-        if (disposed) return;
-        frameId = window.requestAnimationFrame(animate);
-        if (document.visibilityState === "hidden") return;
+      const handlePointerLeave = () => {
+        targetPointer.set(0, 0);
+        targetHover = 0;
+      };
 
-        try {
-          const delta = previousTime === 0 ? 0 : Math.min((now - previousTime) / 1000, 0.05);
-          previousTime = now;
-          if (!reducedMotion) elapsed += delta;
+      container.addEventListener("mousemove", handlePointerMove);
+      container.addEventListener("mouseleave", handlePointerLeave);
+      container.addEventListener("touchmove", handlePointerMove);
+      container.addEventListener("touchend", handlePointerLeave);
 
-          const current = activityRef.current;
-          const intensity = PHASE_INTENSITY[current.phase];
-          const isActive =
-            current.phase === "preflight" ||
-            current.phase === "security" ||
-            current.phase === "routing" ||
-            current.phase === "local_execution" ||
-            current.phase === "cloud_execution" ||
-            current.phase === "director_execution" ||
-            current.phase === "saving";
-          const requestEnd = isActive ? Date.now() : current.updatedAt;
-          const requestAge = current.startedAt
-            ? Math.min(Math.max(0, (requestEnd - current.startedAt) / 1000), 120)
-            : 0;
-          const pointer = reducedMotion ? new THREE.Vector2(0, 0) : pointerRef.current;
-          const pointerStrength = Math.min(1, pointer.length());
-          const pulseRate = 0.42 + intensity * 0.82 + Math.min(requestAge / 120, 1) * 0.2;
-          const turbulence = 0.22 + intensity * 0.78 + pointerStrength * 0.36;
-          const rotationSpeed = reducedMotion ? 0 : 0.055 + intensity * 0.31;
-          const outputEnergy = Math.min(Math.log1p(current.outputCharacters) / 9, 0.22);
-          const energy = Math.min(0.48 + intensity * 0.38 + outputEnergy, 1);
+      const clock = new THREE.Clock();
 
-          for (const uniforms of [coreUniforms, ribbonUniforms]) {
-            uniforms.uTime.value = elapsed;
-            uniforms.uPulseRate.value = reducedMotion ? 0 : pulseRate;
-            uniforms.uEnergy.value = energy;
-            uniforms.uTurbulence.value = turbulence;
-            uniforms.uRotationSpeed.value = rotationSpeed;
-            uniforms.uPointer.value.lerp(pointer, 0.08);
-          }
+      const animate = () => {
+        animationFrameId = requestAnimationFrame(animate);
+        const delta = Math.min(clock.getDelta(), 0.1);
 
-          rig.rotation.y += delta * rotationSpeed;
-          rig.rotation.x = pointer.y * 0.16;
-          rig.rotation.z = -pointer.x * 0.12;
-          renderer!.render(scene, camera);
-        } catch {
-          markFailed();
+        let speedMultiplier = 1.0;
+        let targetTurbulence = 0.16;
+        let targetPulse = 1.0;
+        let targetColorShift = 0.0;
+        let targetRingTightness = 0.0;
+        let targetWaveMorph = 0.0;
+
+        if (activePhase === "idle") {
+          speedMultiplier = 0.45;
+          targetTurbulence = 0.08;
+          targetPulse = 0.75;
+          targetColorShift = 0.0;
+          targetRingTightness = 0.0;
+          targetWaveMorph = 0.0;
+        } else if (activePhase === "thinking" || activePhase === "analyzing" || activePhase === "processing") {
+          speedMultiplier = 3.8;
+          targetTurbulence = 0.75;
+          targetPulse = 4.5;
+          targetColorShift = 1.0;
+          targetRingTightness = 1.0;
+          targetWaveMorph = 0.2;
+        } else if (activePhase === "talking") {
+          speedMultiplier = 2.6;
+          targetTurbulence = 0.55;
+          targetPulse = 6.8;
+          targetColorShift = 0.4;
+          targetRingTightness = 0.25;
+          targetWaveMorph = 1.0;
+        } else if (activePhase === "listening") {
+          speedMultiplier = 2.2;
+          targetTurbulence = 0.4;
+          targetPulse = 3.6;
+          targetColorShift = 0.3;
+          targetRingTightness = 0.3;
+          targetWaveMorph = 0.5;
+        } else if (activePhase === "auto" || activePhase === "directAction") {
+          speedMultiplier = 3.6;
+          targetTurbulence = 0.7;
+          targetPulse = 4.8;
+          targetColorShift = 0.8;
+          targetRingTightness = 0.8;
+          targetWaveMorph = 0.4;
+        } else {
+          speedMultiplier = 1.2;
+          targetTurbulence = 0.22;
+          targetPulse = 1.8;
+          targetColorShift = 0.2;
         }
+
+        uniforms.uTime.value += delta * speedMultiplier;
+        uniforms.uTurbulence.value += (targetTurbulence - uniforms.uTurbulence.value) * 0.12;
+        uniforms.uPulse.value += (targetPulse - uniforms.uPulse.value) * 0.12;
+        uniforms.uColorShift.value += (targetColorShift - uniforms.uColorShift.value) * 0.12;
+        uniforms.uRingTightness.value += (targetRingTightness - uniforms.uRingTightness.value) * 0.12;
+        uniforms.uWaveMorph.value += (targetWaveMorph - uniforms.uWaveMorph.value) * 0.15;
+
+        currentPointer.lerp(targetPointer, 0.12);
+        currentHover += (targetHover - currentHover) * 0.12;
+        uniforms.uPointer.value.copy(currentPointer);
+        uniforms.uHover.value = currentHover;
+
+        group.rotation.y += delta * (0.45 + targetRingTightness * 1.8) * speedMultiplier;
+        group.rotation.x += delta * 0.18;
+
+        renderer?.render(scene, camera);
       };
-      frameId = window.requestAnimationFrame(animate);
+
+      animate();
+
+      const handleResize = () => {
+        if (!container || !renderer) return;
+        const w = container.clientWidth || 44;
+        const h = container.clientHeight || 44;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      };
+      window.addEventListener("resize", handleResize);
+      if (typeof ResizeObserver !== "undefined") {
+        resizeObserver = new ResizeObserver(() => handleResize());
+        resizeObserver.observe(container);
+      }
 
       return () => {
-        disposed = true;
-        window.cancelAnimationFrame(frameId);
-        observer?.disconnect();
-        if (!observer) window.removeEventListener("resize", resize);
-        media.removeEventListener("change", onMotionChange);
-        renderer?.domElement.removeEventListener("webglcontextlost", onContextLost);
-        coreGeometry?.dispose();
-        ribbonGeometry?.dispose();
-        coreMaterial?.dispose();
-        ribbonMaterial?.dispose();
+        cancelAnimationFrame(animationFrameId);
+        window.removeEventListener("resize", handleResize);
+        resizeObserver?.disconnect();
+        container.removeEventListener("mousemove", handlePointerMove);
+        container.removeEventListener("mouseleave", handlePointerLeave);
+        container.removeEventListener("touchmove", handlePointerMove);
+        container.removeEventListener("touchend", handlePointerLeave);
+        if (renderer?.domElement && container.contains(renderer.domElement)) {
+          container.removeChild(renderer.domElement);
+        }
+        geometry.dispose();
+        material.dispose();
+        particleGeo.dispose();
+        particleMat.dispose();
         renderer?.dispose();
-        if (renderer?.domElement.parentElement === mount) mount.removeChild(renderer.domElement);
       };
-    } catch {
-      markFailed();
-      renderer?.dispose();
-      return () => {
-        disposed = true;
-        if (renderer?.domElement.parentElement === mount) mount.removeChild(renderer.domElement);
-      };
+    } catch (err) {
+      console.warn("ThreeJS WebGL context notice:", err);
+      setHasWebGL(false);
     }
-  }, [failed, pointerRef]);
+  }, [activePhase]);
 
-  if (failed) return <div className="holo-orb-error-boundary" role="status">WebGL renderer unavailable</div>;
-  return <div ref={mountRef} className="holo-orb-webgl" aria-hidden="true" />;
-}
-
-export default function HoloOrb({ className = "", showLabel = true, style }: Props) {
-  const { requestActivity } = useDirector();
-  const pointerRef = useRef(new THREE.Vector2(0, 0));
-  const [pointerActive, setPointerActive] = useState(false);
-  const pointerActiveRef = useRef(false);
-  const label = phaseLabel(requestActivity);
-  const lifecyclePhase = requestActivity.phase === "preflight" ? "classified" : requestActivity.phase === "routing" ? "routed" : requestActivity.phase === "local_execution" || requestActivity.phase === "cloud_execution" || requestActivity.phase === "director_execution" ? "streaming" : requestActivity.phase;
-
-  const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    const bounds = event.currentTarget.getBoundingClientRect();
-    if (bounds.width <= 0 || bounds.height <= 0) return;
-    const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width) * 2 - 1));
-    const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height) * 2 - 1));
-    pointerRef.current.set(x, y);
-    if (!pointerActiveRef.current) {
-      pointerActiveRef.current = true;
-      setPointerActive(true);
-    }
-  };
-
-  const onPointerLeave = () => {
-    pointerRef.current.set(0, 0);
-    pointerActiveRef.current = false;
-    setPointerActive(false);
-  };
+  const shouldShowLabel = Boolean(showStatusLabel || showLabel);
 
   return (
     <div
-      className={["holo-orb-host", className].filter(Boolean).join(" ")}
-      data-phase={requestActivity.phase}
-      data-lifecycle-phase={lifecyclePhase}
-      data-pointer={pointerActive ? "active" : "idle"}
-      role="img"
-      aria-label={"OmniAI activity core: " + label}
-      onPointerMove={onPointerMove}
-      onPointerLeave={onPointerLeave}
-      style={{
-        ...style,
-        position: "relative",
-        isolation: "isolate",
-        display: "block",
-        minWidth: 0,
-        minHeight: 0,
-        width: "100%",
-        height: "100%",
-        maxWidth: "100%",
-        maxHeight: "100%",
-        overflow: "hidden",
-        contain: "layout paint",
-        boxSizing: "border-box",
-        background: "radial-gradient(circle at 50% 48%, rgba(0,242,254,0.08), rgba(7,11,24,0.96) 68%)",
-      }}
+      onClick={onClick}
+      style={style}
+      className={`hologram relative inline-flex items-center justify-center select-none cursor-pointer ${resolvedSizeClass} ${className}`}
+      title="OmniAI HoloOrb"
     >
-      <style>{HOST_CSS}</style>
-      <OrbErrorBoundary>
-        <OrbCanvas activity={requestActivity} pointerRef={pointerRef} />
-      </OrbErrorBoundary>
-      {showLabel && (
-        <span
-          className="holo-orb-label dms-mono"
-          role="status"
-          aria-live="polite"
-          style={{
-            position: "absolute",
-            zIndex: 2,
-            left: 8,
-            right: 8,
-            bottom: 6,
-            overflow: "hidden",
-            color: "#b9efff",
-            fontSize: 10,
-            letterSpacing: "0.12em",
-            textAlign: "center",
-            textOverflow: "ellipsis",
-            textTransform: "uppercase",
-            whiteSpace: "nowrap",
-            textShadow: "0 0 12px rgba(0,242,254,0.52)",
-            pointerEvents: "none",
-          }}
-        >
-          {label}
+      {/* Matte black foundation with bluish-white and cyan-violet pulsing box-shadow halo */}
+      <div 
+        className="absolute inset-0 rounded-full bg-[#000000] shadow-[0_0_16px_rgba(0,229,255,0.4),0_0_24px_rgba(139,92,246,0.25),inset_0_0_10px_rgba(0,229,255,0.2)] transition-all duration-500 border border-[#00e5ff]/50"
+      />
+
+      {/* 3D WebGL Canvas */}
+      {hasWebGL ? (
+        <div ref={containerRef} className="w-full h-full relative z-10 rounded-full overflow-hidden" />
+      ) : (
+        <div className="w-full h-full rounded-full bg-[#000000] border border-[#00e5ff]/60 flex items-center justify-center relative z-10">
+          <div className="w-2/3 h-2/3 rounded-full bg-gradient-to-tr from-[#6c63ff] via-[#00f0ff] to-white animate-pulse" />
+        </div>
+      )}
+
+      {shouldShowLabel && (
+        <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] tracking-wider uppercase font-mono text-[#00e5ff] whitespace-nowrap pointer-events-none">
+          {activePhase}
         </span>
       )}
     </div>
   );
-}
+};
+
+export default HoloOrb;

@@ -1,4 +1,4 @@
 "use client";
 
-export { default } from "@/components/HoloOrb";
-export type { WorkspaceRequestPhase as OrbState } from "@/lib/directorMode";
+export { default, HoloOrb } from "@/components/HoloOrb";
+export type { OrbPhase, HoloOrbProps, OrbState } from "@/components/HoloOrb";

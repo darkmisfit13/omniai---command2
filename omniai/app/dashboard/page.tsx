@@ -2469,17 +2469,48 @@ export default function DashboardPage() {
           min-width: 0;
           align-items: flex-start;
           gap: 12px;
-          border: 1px solid #443253;
-          border-radius: 13px;
-          padding: 15px;
-          background: linear-gradient(145deg, #140f20f2, #0c0a14f5);
-          transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+          border: 1px solid rgba(167, 139, 250, 0.18);
+          border-radius: 14px;
+          padding: 16px;
+          background: linear-gradient(
+            145deg,
+            rgba(20, 15, 32, 0.92),
+            rgba(10, 8, 17, 0.96)
+          );
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 4px 16px rgba(0, 0, 0, 0.25);
+          cursor: pointer;
+          user-select: none;
+          transition:
+            transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+            border-color 200ms ease,
+            box-shadow 200ms ease,
+            background 200ms ease;
+          will-change: transform, border-color, box-shadow;
         }
 
         .omni-shortcut:hover {
-          transform: translateY(-2px);
-          border-color: #9274e9a8;
-          box-shadow: 0 8px 26px #6c63ff15;
+          transform: translateY(-2px) scale(1.05);
+          border-color: #00ffff;
+          background: linear-gradient(
+            145deg,
+            rgba(28, 20, 48, 0.96),
+            rgba(12, 10, 22, 0.98)
+          );
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.08),
+            0 12px 32px rgba(0, 0, 0, 0.35),
+            0 0 16px rgba(0, 255, 255, 0.45),
+            0 0 32px rgba(0, 242, 254, 0.25);
+        }
+
+        .omni-shortcut:active {
+          transform: translateY(0px) scale(0.95);
+          border-color: #00ffff;
+          box-shadow:
+            inset 0 3px 8px rgba(0, 0, 0, 0.6),
+            0 2px 6px rgba(0, 0, 0, 0.3),
+            0 0 14px rgba(0, 255, 255, 0.4);
+          transition-duration: 75ms;
         }
 
         .omni-shortcut-code {
@@ -2807,20 +2838,31 @@ export default function DashboardPage() {
             rgba(24, 18, 37, 0.88),
             rgba(10, 8, 17, 0.94)
           );
-          transition: border-color 180ms ease, transform 180ms ease,
-            box-shadow 180ms ease, background 180ms ease;
+          transition: border-color 200ms ease, transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+            box-shadow 200ms ease, background 200ms ease;
         }
 
         .omni-dashboard .omni-shortcut:hover {
-          border-color: rgba(167, 139, 250, 0.46);
+          border-color: rgba(0, 242, 254, 0.55);
           background: linear-gradient(
             145deg,
             rgba(34, 23, 53, 0.96),
             rgba(13, 9, 23, 0.98)
           );
-          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22),
-            0 0 25px rgba(124, 58, 237, 0.08);
-          transform: translateY(-3px);
+          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35),
+            0 0 20px rgba(0, 242, 254, 0.28),
+            0 0 35px rgba(139, 92, 246, 0.2);
+          transform: translateY(-2px) scale(1.02);
+        }
+
+        .omni-dashboard .omni-shortcut:active {
+          transform: translateY(0px) scale(0.97);
+          border-color: rgba(0, 242, 254, 0.75);
+          box-shadow:
+            inset 0 2px 6px rgba(0, 0, 0, 0.5),
+            0 2px 8px rgba(0, 0, 0, 0.2),
+            0 0 12px rgba(0, 242, 254, 0.35);
+          transition-duration: 75ms;
         }
 
         .omni-dashboard .omni-button {
@@ -3311,22 +3353,37 @@ export default function DashboardPage() {
     radial-gradient(ellipse at 0% 0%, rgba(124, 58, 237, 0.09), transparent 56%),
     linear-gradient(145deg, rgba(24, 18, 36, 0.85), rgba(10, 9, 16, 0.96));
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.035);
+  cursor: pointer;
+  user-select: none;
   transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    background 180ms ease,
-    box-shadow 180ms ease;
+    transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 200ms ease,
+    background 200ms ease,
+    box-shadow 200ms ease;
+  will-change: transform, border-color, box-shadow;
 }
 
 .omni-dashboard .omni-shortcut:hover {
-  transform: translateY(-3px);
-  border-color: rgba(167, 139, 250, 0.4);
+  transform: translateY(-2px) scale(1.05);
+  border-color: #00ffff;
   background:
     radial-gradient(ellipse at 0% 0%, rgba(124, 58, 237, 0.16), transparent 58%),
     linear-gradient(145deg, rgba(32, 23, 49, 0.94), rgba(11, 9, 18, 0.98));
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.055),
-    0 12px 28px rgba(0,0,0,0.2);
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 12px 32px rgba(0, 0, 0, 0.45),
+    0 0 24px rgba(0, 255, 255, 0.45),
+    0 0 40px rgba(0, 242, 254, 0.3);
+}
+
+.omni-dashboard .omni-shortcut:active {
+  transform: translateY(0px) scale(0.95);
+  border-color: #00ffff;
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.6),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    0 0 14px rgba(0, 255, 255, 0.4);
+  transition-duration: 75ms;
 }
 
 .omni-dashboard .omni-shortcut-code {

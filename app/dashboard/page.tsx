@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import HoloOrb from "@/components/HoloOrb";
 import { supabase } from "@/lib/supabaseClient";
 import { environmentAreas } from "@/lib/environment-areas";
@@ -69,6 +70,30 @@ const statePalette: Record<SignalState, string> = {
   idle: "#b9a0ff",
 };
 
+const shortcuts = [
+  {
+    code: "AI",
+    title: "AI workspace",
+    description: "Plan, write, reason, and work with your AI.",
+    href: "/",
+    label: "Open workspace",
+  },
+  {
+    code: "IO",
+    title: "Local diagnostics",
+    description: "Inspect your local AI service.",
+    href: "/local-diagnostics",
+    label: "Inspect system",
+  },
+  {
+    code: "OK",
+    title: "Review proposals",
+    description: "Check drafts and approval requirements.",
+    href: "/approvals",
+    label: "Review items",
+  },
+];
+
 function providerName(name: string) {
   const names: Record<string, string> = {
     groq: "Groq",
@@ -118,7 +143,12 @@ function SignalCore({
   return (
     <section className={`omni-core ${active ? "is-active" : ""}`}>
       <div className="omni-core-canvas">
-        <HoloOrb className="omni-dashboard-holo-orb" showLabel={false} />
+        <HoloOrb
+          className="omni-dashboard-holo-orb w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96"
+          size="hero"
+          phase={active ? "thinking" : "idle"}
+          showLabel={false}
+        />
 
         {/* Title rides inside the graphic, upper-left, like the reference deck. */}
         <div className="omni-core-canvas-head">
@@ -163,6 +193,17 @@ function SignalCore({
 type Strand = { color: string; level: number; label: string };
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const [loadingShortcut, setLoadingShortcut] = useState<string | null>(null);
+
+  const handleShortcutClick = (e: React.MouseEvent, href: string) => {
+    e.preventDefault();
+    setLoadingShortcut(href);
+    setTimeout(() => {
+      router.push(href);
+    }, 240);
+  };
+
   const [checkingOllama, setCheckingOllama] = useState(false);
   const [ollamaResult, setOllamaResult] = useState<OllamaResult | null>(null);
   const [checkingConnections, setCheckingConnections] = useState(false);
@@ -1297,6 +1338,52 @@ export default function DashboardPage() {
         </div>
       </section>
 
+      {/* ---- shortcuts / quick access ---- */}
+      <section className="omni-section">
+        <div className="omni-section-heading">
+          <div>
+            <p className="omni-label">
+              OPERATIONS <span>/</span> QUICK ACCESS
+            </p>
+            <h2>Ready when you are.</h2>
+          </div>
+        </div>
+
+        <div className="omni-shortcut-grid">
+          {shortcuts.map((item) => {
+            const isLoading = loadingShortcut === item.href;
+            return (
+              <a
+                href={item.href}
+                onClick={(e) => handleShortcutClick(e, item.href)}
+                className={`omni-shortcut ${isLoading ? "is-loading" : ""}`}
+                key={item.title}
+              >
+                <span className="omni-shortcut-code">
+                  {isLoading ? (
+                    <span className="omni-shortcut-spinner">⟳</span>
+                  ) : (
+                    item.code
+                  )}
+                </span>
+                <span className="omni-shortcut-copy">
+                  <strong>{item.title}</strong>
+                  <small>{item.description}</small>
+                  <b>
+                    {isLoading ? "Connecting..." : item.label}
+                    {isLoading ? (
+                      <span className="omni-shortcut-pulse" />
+                    ) : (
+                      <span>↗</span>
+                    )}
+                  </b>
+                </span>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+
       <footer className="omni-safety">
         <span className="omni-safety-icon" aria-hidden="true">◇</span>
         <div>
@@ -1604,6 +1691,9 @@ export default function DashboardPage() {
           overflow: hidden;
           border: none;
           border-radius: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           /* The block keeps its size — just a little darker than the deck it
              sits on. The core's reflection bounces across it from the WebGL
              scene (alpha canvas), so no bezel, no screen chrome. */
@@ -1614,6 +1704,12 @@ export default function DashboardPage() {
             rgba(4, 3, 9, 0.68) 100%
           );
           box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.42);
+        }
+
+        .omni-dashboard-holo-orb {
+          margin: auto;
+          position: relative;
+          z-index: 1;
         }
 
         .omni-core-canvas canvas {
@@ -2478,6 +2574,151 @@ export default function DashboardPage() {
           white-space: nowrap;
           color: #87799f;
           font-size: 9.5px;
+        }
+
+        /* ---- shortcuts / quick access ---- */
+        .omni-shortcut-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 12px;
+        }
+
+        .omni-shortcut {
+          display: flex;
+          min-width: 0;
+          align-items: flex-start;
+          gap: 12px;
+          border: 1px solid rgba(167, 139, 250, 0.18);
+          border-radius: 14px;
+          padding: 16px;
+          background: linear-gradient(
+            145deg,
+            rgba(20, 15, 32, 0.92),
+            rgba(10, 8, 17, 0.96)
+          );
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 4px 16px rgba(0, 0, 0, 0.25);
+          cursor: pointer;
+          user-select: none;
+          transition:
+            transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+            border-color 200ms ease,
+            box-shadow 200ms ease,
+            background 200ms ease;
+          will-change: transform, border-color, box-shadow;
+        }
+
+        .omni-shortcut:hover {
+          transform: translateY(-2px) scale(1.05);
+          border-color: #00ffff;
+          background: linear-gradient(
+            145deg,
+            rgba(28, 20, 48, 0.96),
+            rgba(12, 10, 22, 0.98)
+          );
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.08),
+            0 12px 32px rgba(0, 0, 0, 0.35),
+            0 0 16px rgba(0, 255, 255, 0.45),
+            0 0 32px rgba(0, 242, 254, 0.25);
+        }
+
+        .omni-shortcut:active {
+          transform: translateY(0px) scale(0.95);
+          border-color: #00ffff;
+          box-shadow:
+            inset 0 3px 8px rgba(0, 0, 0, 0.6),
+            0 2px 6px rgba(0, 0, 0, 0.3),
+            0 0 14px rgba(0, 255, 255, 0.4);
+          transition-duration: 75ms;
+        }
+
+        .omni-shortcut.is-loading {
+          border-color: #00ffff !important;
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            0 0 24px rgba(0, 255, 255, 0.5),
+            inset 0 0 12px rgba(0, 255, 255, 0.2) !important;
+          pointer-events: none;
+        }
+
+        .omni-shortcut-spinner {
+          display: inline-block;
+          animation: omni-spin 0.8s linear infinite;
+          color: #00ffff;
+          font-size: 15px;
+        }
+
+        .omni-shortcut-pulse {
+          display: inline-block;
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: #00ffff;
+          margin-left: 6px;
+          box-shadow: 0 0 8px #00ffff;
+          animation: omni-pulse 0.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes omni-spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+
+        .omni-shortcut-code {
+          display: grid;
+          place-items: center;
+          width: 38px;
+          height: 38px;
+          flex-shrink: 0;
+          border-radius: 10px;
+          border: 1px solid rgba(167, 139, 250, 0.25);
+          background: rgba(139, 92, 246, 0.12);
+          color: #c4b5fd;
+          font-family: var(--dms-mono, monospace);
+          font-size: 12px;
+          font-weight: 700;
+          transition: border-color 200ms ease, background 200ms ease, color 200ms ease;
+        }
+
+        .omni-shortcut:hover .omni-shortcut-code {
+          border-color: rgba(0, 242, 254, 0.5);
+          background: rgba(0, 242, 254, 0.15);
+          color: #00f2fe;
+        }
+
+        .omni-shortcut-copy {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          min-width: 0;
+        }
+
+        .omni-shortcut-copy strong {
+          color: #f1f0f7;
+          font-size: 13px;
+          font-weight: 600;
+        }
+
+        .omni-shortcut-copy small {
+          color: #8d87a8;
+          font-size: 11px;
+          line-height: 1.4;
+        }
+
+        .omni-shortcut-copy b {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          margin-top: 4px;
+          font-size: 11px;
+          color: #a78bfa;
+          font-weight: 600;
+          transition: color 200ms ease, transform 200ms ease;
+        }
+
+        .omni-shortcut:hover .omni-shortcut-copy b {
+          color: #00f2fe;
+          transform: translateX(2px);
         }
 
         /* ---- safety footer ---- */

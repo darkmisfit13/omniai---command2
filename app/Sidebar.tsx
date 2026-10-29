@@ -38,7 +38,6 @@ const navigation: {
 }[] = [
   { label: "Dashboard", href: "/dashboard", icon: "dashboard" },
   { label: "AI Director", href: "/", icon: "chat", hint: "OmniAI Chat" },
-  { label: "Call HUD", href: "/call", icon: "pulse", hint: "Live Tri-Council Call" },
   { label: "Omni Imagine", href: "/studio/image-studio", icon: "media", hint: "Image Studio" },
   { label: "OmniWave", href: "/studio/music", icon: "music", hint: "Music Studio" },
   { label: "OmniMotion", href: "/video-studio", icon: "film", hint: "Video Studio" },
@@ -57,7 +56,7 @@ const navigation: {
   { label: "Automations", href: "/automations", icon: "pulse", hint: "Preview workflows" },
   { label: "Prompt Studio", href: "/prompts", icon: "chat", hint: "Enhance prompts" },
   { label: "Media Library", href: "/studio/assets", icon: "media", hint: "Your creative files" },
-  { label: "Website Analyzer", href: "/website", icon: "website", hint: "Audit site structure" },
+  { label: "OmniAnalyzer Studio", href: "/website", icon: "website", hint: "Scraping & social listening" },
   { label: "Inbox Prioritizer", href: "/email-triage", icon: "email", hint: "Email follow-ups" },
   { label: "Settings", href: "/settings", icon: "settings", hint: "Account & preferences" },
   { label: "Billing & Plans", href: "/settings/billing", icon: "pricing", hint: "Subscription & credits" },
@@ -81,7 +80,7 @@ const navGroups: {
     return hrefList.map(function (h) { return pick(h); }).filter(Boolean) as { label: string; href: string; icon: IconName; hint?: string }[];
   }
   return [
-    { key: "core", label: "Core Intelligence", accent: "#a78bfa", items: items(["/dashboard", "/", "/call"]) },
+    { key: "core", label: "Core Intelligence", accent: "#a78bfa", items: items(["/dashboard", "/"]) },
     { key: "creative", label: "Creative Studios", accent: "#e879f9", items: items(["/studio/image-studio", "/studio/music", "/video-studio", "/studio/mv-studio", "/studio/voice-studio", "/studio/storyboard"]) },
     { key: "specialized", label: "Specialized Tools", accent: "#00f2fe", items: items(["/studio/face-swap", "/studio/spatial-3d", "/studio/vector-graphics", "/studio/viral-mockup"]) },
     { key: "build", label: "Build & Integrations", accent: "#6ee7b7", items: items(["/studio/app-builder", "/studio/backend-architect", "/studio/ui-lab", "/studio/api-connector", "/integrations", "/automations"]) },

@@ -102,3 +102,21 @@ alter table allowed_actions enable row level security;
 alter table approval_queue enable row level security;
 alter table audit_log enable row level security;
 alter table spend_tracking enable row level security;
+
+-- OmniAI - Nexus Live State Synchronization Ledger
+create table public.nexus_active_state_sync (
+    session_id uuid primary key default gen_random_uuid(),
+    user_id varchar(50) not null default 'nexus-owner-dev-001',
+    current_pane_index int default 2,
+    last_prompt_input text,
+    active_tone_selection varchar(20) default 'Casual',
+    active_inference_speed varchar(20) default 'Ultra',
+    device_origin varchar(20) default 'Web-Desktop',
+    is_streaming boolean default false,
+    security_shield_level varchar(20) default 'Ironclad',
+    payload_metadata jsonb default '{}'::jsonb,
+    updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+alter table public.nexus_active_state_sync enable row level security;
+

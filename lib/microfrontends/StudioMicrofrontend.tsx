@@ -46,7 +46,6 @@ export const STUDIO_MICROFRONTEND_MATRIX: StudioManifestEntry[] = [
   { id: "face-swap", slug: "face-swap", label: "OmniStyle", route: "/studio/face-swap", group: "creative", accent: "#fcd34d", description: "Digital costume and swap surfaces", load: () => import("../../app/face-swap/page") },
   { id: "media-vault", slug: "assets", label: "Media Library", route: "/studio/assets", group: "archive", accent: "#ffb84d", description: "Vault browsing and asset archive surfaces", load: () => import("../../app/assets/page") },
   { id: "pricing-upgrade", slug: "pricing", label: "Pricing & Credits", route: "/studio/pricing", group: "system", accent: "#6c63ff", description: "Plan and upgrade surfaces", load: () => import("../../app/pricing/page") },
-  { id: "call-hud", slug: "call", label: "Call HUD · Council", route: "/studio/call", group: "system", accent: "#0C00CA", description: "Live Tri-Agent Call and Council Performance HUD", load: () => import("../../app/call/page") },
 ];
 
 export const STUDIO_MICROFRONTEND_LOADERS = Object.fromEntries(

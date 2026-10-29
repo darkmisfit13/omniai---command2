@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import ProviderConsole from "./ProviderConsole";
 import WorkspaceControls from "./WorkspaceControls";
+import ApiTestSuite from "./ApiTestSuite";
 
 type UserRow = {
   id: string;
@@ -15,7 +16,7 @@ type UserRow = {
   lastSignInAt: string | null;
 };
 
-type AdminTab = "providers" | "users";
+type AdminTab = "providers" | "users" | "api-test-suite";
 
 export default function AdminPage() {
   const [tab, setTab] = useState<AdminTab>("providers");
@@ -94,6 +95,7 @@ export default function AdminPage() {
         {([
           { key: "providers", label: "AI Providers", hint: "connect or disconnect keys" },
           { key: "users", label: "Users", hint: `${users.length} registered` },
+          { key: "api-test-suite", label: "API Test Suite", hint: "Batch-test integrated endpoints" },
         ] as { key: AdminTab; label: string; hint: string }[]).map((entry) => (
           <button
             key={entry.key}
@@ -107,7 +109,9 @@ export default function AdminPage() {
         ))}
       </div>
 
-      {tab === "providers" ? (
+      {tab === "api-test-suite" ? (
+        <ApiTestSuite />
+      ) : tab === "providers" ? (
         <div className="space-y-6">
           <ProviderConsole />
           <WorkspaceControls />

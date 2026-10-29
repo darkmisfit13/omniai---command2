@@ -1134,17 +1134,17 @@ export default function OmniSpatial3DStudio() {
           <div className="space-y-3 pt-2 border-t border-[#1c1538]">
             <div className="flex items-center justify-between">
               <label className="text-[11px] font-semibold text-zinc-300 flex items-center gap-1.5">
-                <SlidersHorizontal className="size-3.5 text-[#00ffff]" />
+                <SlidersHorizontal className="size-3.5 text-[#00f2ff]" />
                 Material Properties (PBR)
               </label>
-              <span className="text-[10px] font-mono text-[#00ffff]">Live Shading</span>
+              <span className="text-[10px] font-mono text-[#00ffcc]">Live Shading</span>
             </div>
 
             {/* Metallic Reflectivity */}
             <div className="space-y-1">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-zinc-400 text-[11px]">Metallic Reflectivity</span>
-                <span className="font-mono text-[#00ffff] text-[11px] font-bold">
+                <span className="font-mono text-[#00ffcc] text-[11px] font-bold">
                   {(metallic * 100).toFixed(0)}%
                 </span>
               </div>
@@ -1155,7 +1155,7 @@ export default function OmniSpatial3DStudio() {
                 step={0.01}
                 value={metallic}
                 onChange={(e) => setMetallic(parseFloat(e.target.value))}
-                className="w-full accent-[#0C00CA] bg-[#0a071b] border border-[#1f1638] h-1.5 rounded cursor-pointer"
+                className="w-full accent-[#6366f1] bg-[#1f1638] h-1.5 rounded cursor-pointer"
               />
             </div>
 
@@ -1163,7 +1163,7 @@ export default function OmniSpatial3DStudio() {
             <div className="space-y-1">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-zinc-400 text-[11px]">Roughness</span>
-                <span className="font-mono text-[#00ffff] text-[11px] font-bold">
+                <span className="font-mono text-[#00ffcc] text-[11px] font-bold">
                   {(roughness * 100).toFixed(0)}%
                 </span>
               </div>
@@ -1174,7 +1174,7 @@ export default function OmniSpatial3DStudio() {
                 step={0.01}
                 value={roughness}
                 onChange={(e) => setRoughness(parseFloat(e.target.value))}
-                className="w-full accent-[#0C00CA] bg-[#0a071b] border border-[#1f1638] h-1.5 rounded cursor-pointer"
+                className="w-full accent-[#6366f1] bg-[#1f1638] h-1.5 rounded cursor-pointer"
               />
             </div>
 
@@ -1182,7 +1182,7 @@ export default function OmniSpatial3DStudio() {
             <div className="space-y-1">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-zinc-400 text-[11px]">Alpha Opacity</span>
-                <span className="font-mono text-[#00ffff] text-[11px] font-bold">
+                <span className="font-mono text-[#00ffcc] text-[11px] font-bold">
                   {(opacity * 100).toFixed(0)}%
                 </span>
               </div>
@@ -1193,7 +1193,7 @@ export default function OmniSpatial3DStudio() {
                 step={0.01}
                 value={opacity}
                 onChange={(e) => setOpacity(parseFloat(e.target.value))}
-                className="w-full accent-[#0C00CA] bg-[#0a071b] border border-[#1f1638] h-1.5 rounded cursor-pointer"
+                className="w-full accent-[#6366f1] bg-[#1f1638] h-1.5 rounded cursor-pointer"
               />
             </div>
 
@@ -1201,7 +1201,7 @@ export default function OmniSpatial3DStudio() {
             <div className="space-y-1">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-zinc-400 text-[11px]">Custom Emission Glow</span>
-                <span className="font-mono text-[#00ffff] text-[11px] font-bold">
+                <span className="font-mono text-[#00ffcc] text-[11px] font-bold">
                   {(emission * 100).toFixed(0)}%
                 </span>
               </div>
@@ -1212,7 +1212,7 @@ export default function OmniSpatial3DStudio() {
                 step={0.01}
                 value={emission}
                 onChange={(e) => setEmission(parseFloat(e.target.value))}
-                className="w-full accent-[#0C00CA] bg-[#0a071b] border border-[#1f1638] h-1.5 rounded cursor-pointer"
+                className="w-full accent-[#6366f1] bg-[#1f1638] h-1.5 rounded cursor-pointer"
               />
             </div>
           </div>
@@ -1374,18 +1374,18 @@ export default function OmniSpatial3DStudio() {
           </div>
 
           {/* ========================================================
-              PERMANENT MONOSPACED TELEMETRY BAR (BABY BLUE #00ffff)
+              PERMANENT MONOSPACED TELEMETRY BAR (VIBRANT NEON GREEN #00ffcc)
               ======================================================== */}
           <div className="h-10 border-t border-[#1f1638] bg-[#000000] px-4 flex items-center justify-between text-xs font-mono z-10">
             <div className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
-              <span className="size-2 rounded-full bg-[#00ffff] shadow-[0_0_8px_#00ffff] animate-pulse" />
-              <span className="text-[#00ffff] font-bold tracking-tight">
+              <span className="size-2 rounded-full bg-[#00ffcc] shadow-[0_0_8px_#00ffcc] animate-pulse" />
+              <span className="text-[#00ffcc] font-bold tracking-tight">
                 [Nexus-Inference: Max-Speed / Local-Ollama Override] · [Nexus-Spatial: WebGL 3D Matrix Active]
               </span>
             </div>
             <div className="hidden sm:flex items-center gap-3 text-[11px] text-zinc-400">
-              <span>Shader: <span className="text-[#0C00CA] font-bold">Vulkan-GLSL</span></span>
-              <span>Device: <span className="text-[#00ffff] font-bold">CUDA/WebGL2</span></span>
+              <span>Shader: <span className="text-[#6366f1] font-bold">Vulkan-GLSL</span></span>
+              <span>Device: <span className="text-[#00ffcc] font-bold">CUDA/WebGL2</span></span>
             </div>
           </div>
         </main>
